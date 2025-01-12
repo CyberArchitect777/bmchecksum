@@ -17,6 +17,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 """
 
 import sys
+import hashlib
 
 def help():
     
@@ -54,6 +55,24 @@ def main():
     else:
         command = sys.argv[1]
         base_directory = sys.argv[2]
+
+def calculate_checksum(file_path, algorithm):
+    """
+    Calculate the checksum of a file using the specified algorithm.
+    
+    :param file_path: Path to the file
+    :param algorithm: Hashing algorithm to use ("md5" or "sha1")
+    :return: Checksum of the file
+    """
+    if algorithm == "md5":
+        file_hash = hashlib.md5()
+    elif algorithm == "sha1":
+        file_hash = hashlib.sha1()
+
+    with open(file_path, "rb") as file:
+        for file_chunk in iter(lambda: file.read(4096), b""):
+            file_hash.update(file_chunk)
+    return file_hash.hexdigest()
 
 if __name__ == "__main__":
     
