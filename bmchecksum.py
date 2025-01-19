@@ -18,6 +18,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import sys
 import hashlib
+import os
 
 def help():
     
@@ -55,6 +56,54 @@ def main():
     else:
         command = sys.argv[1]
         base_directory = sys.argv[2]
+        if command == "-c":
+            # Create the directories "bm11-md5sums" and "bm11-sha1sums" if they don't exist
+            if not os.path.exists(os.path.join(base_directory, "bm11-md5sums")):
+                os.makedirs(os.path.join(base_directory, "bm11-md5sums"))
+            if not os.path.exists(os.path.join(base_directory, "bm11-sha1sums")):
+                os.makedirs(os.path.join(base_directory, "bm11-sha1sums"))
+            file_paths = create_file_list(base_directory)
+            for file_path in file_paths:
+                md5_checksum = calculate_checksum(file_path, "md5")
+                sha1_checksum = calculate_checksum(file_path, "sha1")#
+                directory_name = os.path.dirname(file_path)
+                # Remove the "." or "./" from the beginning of the directory name
+                if directory_name.startswith("."):
+                    directory_name = directory_name[1:]
+                if directory_name.startswith("/"):
+                    directory_name = directory_name[1:]
+                print(file_path + " - " + directory_name + " - " + os.path.basename(file_path))
+                # Create a new directory for the new checksums if it doesn't exist
+                if not os.path.exists(os.path.join(base_directory, "bm11-md5sums", directory_name)):
+                    os.makedirs(os.path.join(base_directory, "bm11-md5sums", directory_name))
+                if not os.path.exists(os.path.join(base_directory, "bm11-sha1sums", directory_name)):
+                    os.makedirs(os.path.join(base_directory, "bm11-sha1sums", directory_name))
+                # Write the output of the checksum functions to a mirrored directory structure to the 
+                # original files underneath the bm11-md5sums and bm11-sha1sums directories 
+                with open(os.path.join(base_directory, "bm11-md5sums", directory_name, os.path.basename(file_path) + ".md5"), "w") as md5_file:
+                    md5_file.write(md5_checksum)
+                with open(os.path.join(base_directory, "bm11-sha1sums", directory_name, os.path.basename(file_path) + ".sha1"), "w") as sha1_file:
+                    sha1_file.write(sha1_checksum)
+                # Close the files
+                md5_file.close()
+                sha1_file.close()
+        elif command == "-v":
+                print("Verification functionality not implemented yet")
+
+def create_file_list(base_directory):
+    """
+    Create a list of all files in the base directory and all sub-folders
+    that are not in the immediate bm11-md5sums and bm11-sha1sums directories.
+    
+    :param base_directory: The base directory to walk through
+    :return: List of file paths
+    """
+    file_paths = []
+    for root, dirs, files in os.walk(base_directory):
+        for file in files:
+            if file not in ["bm11-md5sums", "bm11-sha1sums"]:
+                file_paths.append(os.path.join(root, file))
+    return file_paths
 
 def calculate_checksum(file_path, algorithm):
     """
