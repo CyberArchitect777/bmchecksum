@@ -110,14 +110,20 @@ def start_checksum_process(base_directory):
     if not os.path.exists(os.path.join(base_directory, "bm11-md5sums")):
         os.makedirs(os.path.join(base_directory, "bm11-md5sums"))
         print("Creating parent md5 checksum directory...")
+    else:
+        print("Adding to current md5 checksum directory...")
+        print("\nExisting checksum will not be replaced\n")
     if not os.path.exists(os.path.join(base_directory, "bm11-sha1sums")):
         os.makedirs(os.path.join(base_directory, "bm11-sha1sums"))
         print("Creating parent sha1 checksum directory...")
+    else:
+        print("Adding to current sha1 checksum directory...")
+        print("\nExisting checksum will not be replaced\n")
     file_paths = create_file_list(base_directory)
     print("Calculating checksums...")
     for file_path in file_paths:
         md5_checksum = calculate_checksum(file_path, "md5")
-        sha1_checksum = calculate_checksum(file_path, "sha1")#
+        sha1_checksum = calculate_checksum(file_path, "sha1")
         directory_name = os.path.dirname(file_path)
         # Remove the "." or "./" from the beginning of the directory name
         if directory_name.startswith("."):
@@ -131,14 +137,15 @@ def start_checksum_process(base_directory):
             os.makedirs(os.path.join(base_directory, "bm11-sha1sums", directory_name))
         # Write the output of the checksum functions to a mirrored directory structure to the 
         # original files underneath the bm11-md5sums and bm11-sha1sums directories 
-        with open(os.path.join(base_directory, "bm11-md5sums", directory_name, os.path.basename(file_path) + ".md5"), "w") as md5_file:
-            md5_file.write(md5_checksum)
-        with open(os.path.join(base_directory, "bm11-sha1sums", directory_name, os.path.basename(file_path) + ".sha1"), "w") as sha1_file:
-            sha1_file.write(sha1_checksum)
-        # Close the files
-        md5_file.close()
-        sha1_file.close()
-        print("Checksum calculation complete")
+        if not os.path.exists(os.path.join(base_directory, "bm11-md5sums", directory_name, os.path.basename(file_path) + ".md5")):
+            with open(os.path.join(base_directory, "bm11-md5sums", directory_name, os.path.basename(file_path) + ".md5"), "w") as md5_file:
+                md5_file.write(md5_checksum)
+            md5_file.close()
+        if not os.path.exists(os.path.join(base_directory, "bm11-sha1sums", directory_name, os.path.basename(file_path) + ".sha1")):
+            with open(os.path.join(base_directory, "bm11-sha1sums", directory_name, os.path.basename(file_path) + ".sha1"), "w") as sha1_file:
+                sha1_file.write(sha1_checksum)
+            sha1_file.close()
+    print("\nChecksum calculation complete\n")
 
 def create_file_list(base_directory):
     """
