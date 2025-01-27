@@ -53,13 +53,50 @@ def main():
             sys.exit(1)
         elif command == "-c":
             print("Please provide a base directory name to calculate checksums on\n")
+        elif command == "-v":
+            print("Please provide a base directory name to verify checksums on\n")
     else:
         command = sys.argv[1]
         base_directory = sys.argv[2]
         if command == "-c":
             start_checksum_process(base_directory)
         elif command == "-v":
-                print("Verification functionality not implemented yet")
+            start_verification_process(base_directory)
+
+def start_verification_process(base_directory):
+    """
+    Start the verification process on the base directory.
+    :param base_directory: The base directory to walk through
+    """
+    # Check to see if the "bm11-md5sums and "bm11-sha1sums" directories exist
+    if not os.path.exists(os.path.join(base_directory, "bm11-md5sums")) or not os.path.exists(os.path.join(base_directory, "bm11-sha1sums")):
+        print("No verification checksums detected")
+        sys.exit(1)
+    else:
+        file_paths = create_file_list(base_directory)
+        for file_path in file_paths:
+            # Calculate the checksums of the current file
+            file_md5 = calculate_checksum(file_path, "md5")
+            file_sha1 = calculate_checksum(file_path, "sha1")
+            directory_name = os.path.dirname(file_path)
+            # Remove the "." or "./" from the beginning of the directory name
+            if directory_name.startswith("."):
+                directory_name = directory_name[1:]
+            if directory_name.startswith("/"):
+                directory_name = directory_name[1:]
+            # Open the checksum files to compare the checksums
+            with open(os.path.join(base_directory, "bm11-md5sums", directory_name, os.path.basename(file_path) + ".md5"), "r") as md5_file:
+                checksum_md5 = md5_file.read()
+            with open(os.path.join(base_directory, "bm11-sha1sums", directory_name, os.path.basename(file_path) + ".sha1"), "r") as sha1_file:
+                checksum_sha1 = sha1_file.read()
+            # Compare the checksums
+            if file_md5 != checksum_md5:
+                print("MD5 checksum does not match " + file_path)
+            if file_sha1 != checksum_sha1:
+                print("SHA1 checksum does not match " + file_path)
+            # Close the files
+            md5_file.close()
+            sha1_file.close()    
 
 def start_checksum_process(base_directory):
     """
@@ -81,7 +118,6 @@ def start_checksum_process(base_directory):
             directory_name = directory_name[1:]
         if directory_name.startswith("/"):
             directory_name = directory_name[1:]
-        print(file_path + " - " + directory_name + " - " + os.path.basename(file_path))
         # Create a new directory for the new checksums if it doesn't exist
         if not os.path.exists(os.path.join(base_directory, "bm11-md5sums", directory_name)):
             os.makedirs(os.path.join(base_directory, "bm11-md5sums", directory_name))
@@ -108,7 +144,8 @@ def create_file_list(base_directory):
     file_paths = []
     for root, dirs, files in os.walk(base_directory):
         for file in files:
-            if file not in ["bm11-md5sums", "bm11-sha1sums"]:
+            # Make sure that the "bm11-md5sums" and "bm11-sha1sums" directories are not traversed
+            if not root.startswith(os.path.join(base_directory, "bm11-md5sums")) and not root.startswith(os.path.join(base_directory, "bm11-sha1sums")):
                 file_paths.append(os.path.join(root, file))
     return file_paths
 
