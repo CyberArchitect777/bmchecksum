@@ -71,7 +71,7 @@ def start_verification_process(base_directory):
     """
     # Check to see if the "bm11-md5sums and "bm11-sha1sums" directories exist
     if not os.path.exists(os.path.join(base_directory, "bm11-md5sums")) or not os.path.exists(os.path.join(base_directory, "bm11-sha1sums")):
-        print("No verification checksums detected")
+        print("No verification data could be found. Aborting...\n")
         sys.exit(1)
     else:
         print("Verifying based on files and checksums available...")
@@ -99,28 +99,31 @@ def start_verification_process(base_directory):
             # Close the files
             md5_file.close()
             sha1_file.close()    
-            print("Verification complete")
+        print("\nVerification complete\n")
 
 def start_checksum_process(base_directory):
     """
     Start the checksumming process on the base directory.
     :param base_directory: The base directory to walk through
     """
+    addition = False
     # Create the directories "bm11-md5sums" and "bm11-sha1sums" if they don't exist
     if not os.path.exists(os.path.join(base_directory, "bm11-md5sums")):
         os.makedirs(os.path.join(base_directory, "bm11-md5sums"))
         print("Creating parent md5 checksum directory...")
     else:
         print("Adding to current md5 checksum directory...")
-        print("\nExisting checksum will not be replaced\n")
+        addition = True
     if not os.path.exists(os.path.join(base_directory, "bm11-sha1sums")):
         os.makedirs(os.path.join(base_directory, "bm11-sha1sums"))
         print("Creating parent sha1 checksum directory...")
     else:
         print("Adding to current sha1 checksum directory...")
-        print("\nExisting checksum will not be replaced\n")
+        addition = True
+    if addition == True:
+        print("\nExisting checksum will not be replaced")
     file_paths = create_file_list(base_directory)
-    print("Calculating checksums...")
+    print("\nCalculating new checksums...")
     for file_path in file_paths:
         md5_checksum = calculate_checksum(file_path, "md5")
         sha1_checksum = calculate_checksum(file_path, "sha1")
