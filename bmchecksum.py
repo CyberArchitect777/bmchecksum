@@ -113,9 +113,23 @@ def start_verification_process(base_directory):
                     print("* SHA1 checksum does not match " + file_path)           
                     error_flag = True
                 sha1_file.close()
+        md5_file_paths = create_file_list(os.path.join(base_directory, "bm11-md5sums"))
+        for md5_file_path in md5_file_paths:
+            # Remove bm11-md5sums from the beginning and .md5 from the end of the path
+            actual_file_path = "." + md5_file_path[14:-4]
+            print(actual_file_path)
+            if not os.path.exists(actual_file_path):
+                print("* No file available for MD5 checksum " + md5_file_path)
+        sha1_file_paths = create_file_list(os.path.join(base_directory, "bm11-sha1sums"))
+        for sha1_file_path in sha1_file_paths:
+            actual_file_path = "." + sha1_file_path[15:-5]
+            print(actual_file_path)
+            if not os.path.exists(actual_file_path):
+                print("* No file available for SHA1 checksum " + sha1_file_path)
         if error_flag == True:
-            print("\n")
-        print("Verification complete\n")
+            print("\nVerification complete\n")
+        else:
+            print("Verification complete\n")
 
 def start_checksum_process(base_directory):
     """
