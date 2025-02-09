@@ -31,6 +31,7 @@ def help():
     print("\nCommands:")
     print("\n-c = Create checksums for all subdirectories in the base directory")
     print("-v = Verify file checksums in all subdirectories based on those found in the base directory")
+    print("-u = Upgrade checksums from checksum version 1.0 to the latest version (1.1)")
     print("-h = Help\n")
 
 def main():
@@ -56,6 +57,8 @@ def main():
             print("Please provide a base directory name to calculate checksums on\n")
         elif command == "-v":
             print("Please provide a base directory name to verify checksums on\n")
+        elif command == "-u":
+            print("Please provide a base directory name to upgrade checksums on\n")
     else:
         command = sys.argv[1]
         base_directory = sys.argv[2]
@@ -63,6 +66,36 @@ def main():
             start_checksum_process(base_directory)
         elif command == "-v":
             start_verification_process(base_directory)
+        elif command == "-u":
+            start_upgrade_process(base_directory)
+
+def start_upgrade_process(base_directory):
+    """
+    Upgrade version 1.0 checksums to version 1.1 if the older checksums are detected.
+    :param base_directory: The base directory to walk through
+    """
+
+    # Check for version 1.0 checksum directories, named bm-md5sums and bm-sha1sums in the base directory
+
+    older_version_found = False
+    if os.path.exists(os.path.join(base_directory, "bm-md5sums")):
+        older_version_found = True
+    # Rename the bm-md5sums directory to bm11-md5sums
+        os.rename(os.path.join(base_directory, "bm-md5sums"), os.path.join(base_directory, "bm11-md5sums"))
+        file_paths = create_file_list(os.path.join(base_directory, "bm11-md5sums"))
+        for file_path in file_paths:
+            # Rename the files in the new bm11-md5sums directory to have an .md5 extension
+            os.rename(file_path, file_path + ".md5")
+    if os.path.exists(os.path.join(base_directory, "bm-sha1sums")):
+        older_version_found = True
+        os.rename(os.path.join(base_directory, "bm-sha1sums"), os.path.join(base_directory, "bm11-sha1sums"))
+        file_paths = create_file_list(os.path.join(base_directory, "bm11-sha1sums"))
+        for file_path in file_paths:
+            os.rename(file_path, file_path + ".sha1")
+    if older_version_found == True:
+        print("Upgrade complete\n")
+    else:
+        print("Directory does not contain older BMChecksum files\n")
 
 def start_verification_process(base_directory):
     """
