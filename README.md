@@ -33,13 +33,25 @@ The GitHub repository is [here](https://github.com/CyberArchitect777/bmchecksum)
 
 ## Technical
 
+### Program construction
+
 This program was created using the following technologies:
 
 - Python 3
 
+### Checksum format versions
+
+Version 1.1
+
+Having checksum files with the same extension as the original files proved problematic and thus the extensions .md5 and .sha1 was added to each checksum file. To separate this version of the checksum system with the original, the checksum folders were renamed bm11-md5sums and bm11-sha1sums. An upgrade facility has been built into every bmchecksum tool to bring old checksums up to this version.
+
+Version 1.0
+
+In version 1.0, BMChecksum stored checksum files in the base directory being checksummed. If we assume this folder is called "home", then the directories bm-md5sums and bm-sha1sums were created inside this. A file clone of "home" is then created in the two checksum folders minus bm11-md5sums and bm11-sha1sums, although the content of the files created is only a md5 or sha1 checksum.
+
 ## Credits
 
-- ChatGPT for reference and learning material.
+- Github Copilot for rapid development.
 
 ## License
 
