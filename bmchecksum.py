@@ -115,10 +115,10 @@ def start_verification_process(base_directory):
             file_md5 = calculate_checksum(file_path, "md5")
             file_sha1 = calculate_checksum(file_path, "sha1")
             directory_name = os.path.dirname(file_path)
-            # Remove the "." or "./" from the beginning of the directory name
-            if directory_name.startswith("."):
-                directory_name = directory_name[1:]
-            if directory_name.startswith("/"):
+            # Remove the ".", "./" or ".\" from the beginning of the directory name
+            if directory_name.startswith("." + os.sep):
+                directory_name = directory_name[2:]
+            elif directory_name.startswith("."):
                 directory_name = directory_name[1:]
             # Check to see if the md5 checksum file exists and report it if not.
             if not os.path.exists(os.path.join(base_directory, "bm11-md5sums", directory_name, os.path.basename(file_path) + ".md5")):
