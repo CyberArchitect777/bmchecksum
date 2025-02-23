@@ -189,10 +189,10 @@ def start_checksum_process(base_directory):
         md5_checksum = calculate_checksum(file_path, "md5")
         sha1_checksum = calculate_checksum(file_path, "sha1")
         directory_name = os.path.dirname(file_path)
-        # Remove the "." or "./" from the beginning of the directory name
-        if directory_name.startswith("."):
-            directory_name = directory_name[1:]
-        if directory_name.startswith("/"):
+        # Remove the ".", "./" or ".\" from the beginning of the directory name
+        if directory_name.startswith("." + os.sep):
+            directory_name = directory_name[2:]
+        elif directory_name.startswith("."):
             directory_name = directory_name[1:]
         # Create a new directory for the new checksums if it doesn't exist
         if not os.path.exists(os.path.join(base_directory, "bm11-md5sums", directory_name)):
