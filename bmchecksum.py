@@ -122,7 +122,7 @@ def start_verification_process(base_directory):
                 directory_name = directory_name[1:]
             # Check to see if the md5 checksum file exists and report it if not.
             if not os.path.exists(os.path.join(base_directory, "bm11-md5sums", directory_name, os.path.basename(file_path) + ".md5")):
-                print("* No MD5 checksum available for " + file_path)
+                print("* MD5 checksum is missing for file: " + file_path[2:])
                 error_flag = True
             else:
                 # Read the MD5 checksum from the file and check if the stored checksum matches the one from the actual file
@@ -130,12 +130,12 @@ def start_verification_process(base_directory):
                     # Read md5 checksum after stripping newline character for compatibility with Bash version of program
                     checksum_md5 = (md5_file.read()).rstrip()
                     if file_md5 != checksum_md5:
-                        print("* MD5 checksum does not match " + file_path)
+                        print("* File does not match MD5 checksum: " + file_path[2:])
                         error_flag = True
                     md5_file.close()
             # Check to see if the sha1 checksum file exists and report it if not.
             if not os.path.exists(os.path.join(base_directory, "bm11-sha1sums", directory_name, os.path.basename(file_path) + ".sha1")):
-                print("* No SHA1 checksum available for " + file_path)
+                print("* SHA-1 checksum is missing for file: " + file_path[2:])
                 error_flag = True
             else:
                 # Read the SHA1 checksum from the file and check if the stored checksum matches the one from the actual file
@@ -143,7 +143,7 @@ def start_verification_process(base_directory):
                     # Read sha1 checksum after stripping newline character for compatibility with Bash version of program
                     checksum_sha1 = (sha1_file.read()).rstrip()
                 if file_sha1 != checksum_sha1:
-                    print("* SHA1 checksum does not match " + file_path)           
+                    print("* File does not match SHA-1 checksum: " + file_path[2:])           
                     error_flag = True
                 sha1_file.close()
         md5_file_paths = create_file_list(os.path.join(base_directory, "bm11-md5sums"))
