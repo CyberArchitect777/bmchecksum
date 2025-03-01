@@ -110,7 +110,10 @@ def start_verification_process(base_directory):
         print("Verifying based on files and checksums available...\n")
         file_paths = create_file_list(base_directory)
         error_flag = False
+        # Create processed list to hold a count of actual, md5 and sha1 files as well as a count of all errors
+        processed = [0, 0, 0, 0]
         for file_path in file_paths:
+            processed[0] += 1
             # Calculate the checksums of the current file
             file_md5 = calculate_checksum(file_path, "md5")
             file_sha1 = calculate_checksum(file_path, "sha1")
@@ -123,27 +126,35 @@ def start_verification_process(base_directory):
             # Check to see if the md5 checksum file exists and report it if not.
             if not os.path.exists(os.path.join(base_directory, "bm11-md5sums", directory_name, os.path.basename(file_path) + ".md5")):
                 print("* MD5 checksum is missing for file: " + file_path[2:])
+                processed[3] += 1
                 error_flag = True
             else:
+                # Add one to the count of md5 files found
+                processed[1] += 1
                 # Read the MD5 checksum from the file and check if the stored checksum matches the one from the actual file
                 with open(os.path.join(base_directory, "bm11-md5sums", directory_name, os.path.basename(file_path) + ".md5"), "r") as md5_file:
                     # Read md5 checksum after stripping newline character for compatibility with Bash version of program
                     checksum_md5 = (md5_file.read()).rstrip()
                     if file_md5 != checksum_md5:
                         print("* File does not match MD5 checksum: " + file_path[2:])
+                        processed[3] += 1
                         error_flag = True
                     md5_file.close()
             # Check to see if the sha1 checksum file exists and report it if not.
             if not os.path.exists(os.path.join(base_directory, "bm11-sha1sums", directory_name, os.path.basename(file_path) + ".sha1")):
                 print("* SHA-1 checksum is missing for file: " + file_path[2:])
+                processed[3] += 1
                 error_flag = True
             else:
+                # Add one to the count of sha1 files found
+                processed[2] += 1
                 # Read the SHA1 checksum from the file and check if the stored checksum matches the one from the actual file
                 with open(os.path.join(base_directory, "bm11-sha1sums", directory_name, os.path.basename(file_path) + ".sha1"), "r") as sha1_file:
                     # Read sha1 checksum after stripping newline character for compatibility with Bash version of program
                     checksum_sha1 = (sha1_file.read()).rstrip()
                 if file_sha1 != checksum_sha1:
                     print("* File does not match SHA-1 checksum: " + file_path[2:])           
+                    processed[3] += 1
                     error_flag = True
                 sha1_file.close()
         md5_file_paths = create_file_list(os.path.join(base_directory, "bm11-md5sums"))
@@ -152,17 +163,23 @@ def start_verification_process(base_directory):
             actual_file_path = "." + md5_file_path[14:-4]
             if not os.path.exists(actual_file_path):
                 print("* MD5 Checksum Available For Missing File: " + actual_file_path[2:])
+                processed[3] += 1
                 error_flag = True
         sha1_file_paths = create_file_list(os.path.join(base_directory, "bm11-sha1sums"))
         for sha1_file_path in sha1_file_paths:
             actual_file_path = "." + sha1_file_path[15:-5]
             if not os.path.exists(actual_file_path):
                 print("* SHA-1 Checksum Available For Missing File: " + actual_file_path[2:])
+                processed[3] += 1
                 error_flag = True
         if error_flag == True:
             print("\nVerification complete\n")
         else:
             print("Verification complete\n")
+        print("Files processed: " + str(processed[0]))
+        print("MD5 checksums processed: " + str(processed[1]))
+        print("SHA-1 checksums processed: " + str(processed[2]))
+        print("Errors found: " + str(processed[3]) + "\n")
 
 def start_checksum_process(base_directory):
     """
