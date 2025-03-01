@@ -19,6 +19,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 import sys
 import hashlib
 import os
+from datetime import datetime
 
 def help():
     
@@ -70,6 +71,7 @@ def main():
             start_upgrade_process(base_directory)
 
 def start_upgrade_process(base_directory):
+
     """
     Upgrade version 1.0 checksums to version 1.1 if the older checksums are detected.
     :param base_directory: The base directory to walk through
@@ -98,15 +100,19 @@ def start_upgrade_process(base_directory):
         print("Directory does not contain older BMChecksum files\n")
 
 def start_verification_process(base_directory):
+
     """
     Start the verification process on the base directory.
     :param base_directory: The base directory to walk through
     """
+
     # Check to see if the "bm11-md5sums and "bm11-sha1sums" directories exist
     if not os.path.exists(os.path.join(base_directory, "bm11-md5sums")) or not os.path.exists(os.path.join(base_directory, "bm11-sha1sums")):
         print("No verification data could be found. Aborting...\n")
         sys.exit(1)
     else:
+        # Store current date and time for later use
+        start_date = datetime.now()
         print("Verifying based on files and checksums available...\n")
         file_paths = create_file_list(base_directory)
         error_flag = False
@@ -172,20 +178,45 @@ def start_verification_process(base_directory):
                 print("* SHA-1 Checksum Available For Missing File: " + actual_file_path[2:])
                 processed[3] += 1
                 error_flag = True
+        end_date = datetime.now()
+        time_elapsed = end_date - start_date
         if error_flag == True:
-            print("\nVerification complete\n")
+            print("\nVerification complete. Operation took " + return_human_readable_time_elapsed(time_elapsed) + "\n")
         else:
-            print("Verification complete\n")
+            print("Verification complete. Operation took " + return_human_readable_time_elapsed(time_elapsed) + "\n")
         print("Files processed: " + str(processed[0]))
         print("MD5 checksums processed: " + str(processed[1]))
         print("SHA-1 checksums processed: " + str(processed[2]))
         print("Errors found: " + str(processed[3]) + "\n")
 
+def return_human_readable_time_elapsed(time_elapsed):
+    
+    """
+    Read in the time in the format hh:mm:ss.000000 and return a human-readable string.
+    :param time_elapsed: The time elapsed in the format hh:mm:ss.000000
+    :return: A human-readable string of the time elapsed
+    """
+
+    # Split up the elapsed time into hours, minutes and seconds
+    time_elapsed = str(time_elapsed).split(":")
+    # Ensure all numbers are rounded to the nearest integer
+    for i in range(len(time_elapsed)):
+        time_elapsed[i] = str(round(float(time_elapsed[i])))
+    # Only show the hours and minutes if they are more than zero
+    if int(time_elapsed[0]) > 0:
+        return time_elapsed[0] + " hours, " + time_elapsed[1] + " minutes and " + time_elapsed[2] + " seconds."
+    elif int(time_elapsed[1]) > 0:
+        return time_elapsed[1] + " minutes and " + time_elapsed[2] + " seconds."
+    else:
+        return time_elapsed[2] + " seconds."
+
 def start_checksum_process(base_directory):
+    
     """
     Start the checksumming process on the base directory.
     :param base_directory: The base directory to walk through
     """
+
     addition = False
     # Create the directories "bm11-md5sums" and "bm11-sha1sums" if they don't exist
     if not os.path.exists(os.path.join(base_directory, "bm11-md5sums")):
@@ -237,6 +268,7 @@ def start_checksum_process(base_directory):
     print("\nChecksum calculation complete. " + str(files_processed) + " files(s) checksummed.\n")
 
 def create_file_list(base_directory):
+    
     """
     Create a list of all files in the base directory and all sub-folders
     that are not in the immediate bm11-md5sums and bm11-sha1sums directories.
@@ -244,6 +276,7 @@ def create_file_list(base_directory):
     :param base_directory: The base directory to walk through
     :return: List of file paths
     """
+    
     file_paths = []
     for root, dirs, files in os.walk(base_directory):
         for file in files:
@@ -253,13 +286,15 @@ def create_file_list(base_directory):
     return file_paths
 
 def calculate_checksum(file_path, algorithm):
+    
     """
     Calculate the checksum of a file using the specified algorithm.
     
     :param file_path: Path to the file
     :param algorithm: Hashing algorithm to use ("md5" or "sha1")
-    :return: Checksum of the file
+    :return: Checksum of the file    
     """
+    
     if algorithm == "md5":
         file_hash = hashlib.md5()
     elif algorithm == "sha1":
