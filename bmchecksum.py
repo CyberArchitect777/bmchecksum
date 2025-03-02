@@ -225,22 +225,26 @@ def return_human_readable_time_elapsed(time_elapsed):
     else:
         return time_elapsed[2] + " seconds."
 
-def start_checksum_process(base_directory):
+def start_checksum_process(base_directory, mode):
     
     """
     Start the checksumming process on the base directory.
     :param base_directory: The base directory to walk through
+    :param mode: The mode to run the checksumming process
+    0 = Both MD5 and SHA-1
+    1 = MD5 only
+    2 = SHA-1 only
     """
 
     addition = False
     # Create the directories "bm11-md5sums" and "bm11-sha1sums" if they don't exist
-    if not os.path.exists(os.path.join(base_directory, "bm11-md5sums")):
+    if not os.path.exists(os.path.join(base_directory, "bm11-md5sums")) and (mode == 0 or mode == 1):
         os.makedirs(os.path.join(base_directory, "bm11-md5sums"))
         print("MD5 checksum folder not found in starting directory. Creating new checksums for all discovered files...")
     else:
         print("MD5 checksum folder found in starting directory. Adding checksums for new files only...")
         addition = True
-    if not os.path.exists(os.path.join(base_directory, "bm11-sha1sums")):
+    if not os.path.exists(os.path.join(base_directory, "bm11-sha1sums")) and (mode == 0 or mode == 2):
         os.makedirs(os.path.join(base_directory, "bm11-sha1sums"))
         print("SHA-1 checksum folder not found in starting directory. Creating new checksums for all discovered files...")
     else:
@@ -255,8 +259,10 @@ def start_checksum_process(base_directory):
     files_processed = 0
     for file_path in file_paths:
         checksum_written = False
-        md5_checksum = calculate_checksum(file_path, "md5")
-        sha1_checksum = calculate_checksum(file_path, "sha1")
+        if mode == 0 or mode == 1:
+            md5_checksum = calculate_checksum(file_path, "md5")
+        if mode == 0 or mode == 2:
+            sha1_checksum = calculate_checksum(file_path, "sha1")
         directory_name = os.path.dirname(file_path)
         # Remove the ".", "./" or ".\" from the beginning of the directory name
         if directory_name.startswith("." + os.sep):
@@ -264,18 +270,18 @@ def start_checksum_process(base_directory):
         elif directory_name.startswith("."):
             directory_name = directory_name[1:]
         # Create a new directory for the new checksums if it doesn't exist
-        if not os.path.exists(os.path.join(base_directory, "bm11-md5sums", directory_name)):
+        if not os.path.exists(os.path.join(base_directory, "bm11-md5sums", directory_name)) and (mode == 0 or mode == 1):
             os.makedirs(os.path.join(base_directory, "bm11-md5sums", directory_name))
-        if not os.path.exists(os.path.join(base_directory, "bm11-sha1sums", directory_name)):
+        if not os.path.exists(os.path.join(base_directory, "bm11-sha1sums", directory_name)) and (mode == 0 or mode == 2):
             os.makedirs(os.path.join(base_directory, "bm11-sha1sums", directory_name))
         # Write the output of the checksum functions to a mirrored directory structure to the 
         # original files underneath the bm11-md5sums and bm11-sha1sums directories 
-        if not os.path.exists(os.path.join(base_directory, "bm11-md5sums", directory_name, os.path.basename(file_path) + ".md5")):
+        if not os.path.exists(os.path.join(base_directory, "bm11-md5sums", directory_name, os.path.basename(file_path) + ".md5")) and (mode == 0 or mode == 1):
             with open(os.path.join(base_directory, "bm11-md5sums", directory_name, os.path.basename(file_path) + ".md5"), "w") as md5_file:
                 md5_file.write(md5_checksum)
                 checksum_written = True
             md5_file.close()
-        if not os.path.exists(os.path.join(base_directory, "bm11-sha1sums", directory_name, os.path.basename(file_path) + ".sha1")):
+        if not os.path.exists(os.path.join(base_directory, "bm11-sha1sums", directory_name, os.path.basename(file_path) + ".sha1")) and (mode == 0 or mode == 2):
             with open(os.path.join(base_directory, "bm11-sha1sums", directory_name, os.path.basename(file_path) + ".sha1"), "w") as sha1_file:
                 sha1_file.write(sha1_checksum)
                 checksum_written = True
