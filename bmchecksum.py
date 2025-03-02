@@ -234,6 +234,8 @@ def start_checksum_process(base_directory):
     if addition == True:
         print("Existing checksum will not be replaced.")
     file_paths = create_file_list(base_directory)
+    # Store current date and time for later use
+    start_date = datetime.now()
     print("\nCalculating new checksums...")
     files_processed = 0
     for file_path in file_paths:
@@ -265,7 +267,9 @@ def start_checksum_process(base_directory):
             sha1_file.close()
         if checksum_written == True:
             files_processed += 1
-    print("\nChecksum calculation complete. " + str(files_processed) + " files(s) checksummed.\n")
+    end_date = datetime.now()
+    time_elapsed = end_date - start_date
+    print("\nChecksum calculation complete. " + str(files_processed) + " files(s) checksummed. Operation took " + return_human_readable_time_elapsed(time_elapsed) + "\n")
 
 def create_file_list(base_directory):
     
