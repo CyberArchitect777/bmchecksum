@@ -85,6 +85,7 @@ def start_upgrade_process(base_directory):
         older_version_found = True
     if older_version_found == True:
         start_date = datetime.now()
+        files_processed = 0
         # Check for existing MD5 current version checksum directories
         if os.path.exists(os.path.join(base_directory, "bm11-md5sums")):
             print("Current version of MD5 checksum data found. Skipping MD5 checksum upgrade...\n")
@@ -96,6 +97,7 @@ def start_upgrade_process(base_directory):
             for file_path in file_paths:
                 # Rename the files in the new bm11-md5sums directory to have an .md5 extension
                 os.rename(file_path, file_path + ".md5")
+                files_processed += 1
         # Check for existing SHA-1 current version checksum directories
         if os.path.exists(os.path.join(base_directory, "bm11-sha1sums")):
             print("Current version of SHA-1 checksum data found. Skipping SHA-1 checksum upgrade...\n")
@@ -105,9 +107,10 @@ def start_upgrade_process(base_directory):
             file_paths = create_file_list(os.path.join(base_directory, "bm11-sha1sums"))
             for file_path in file_paths:
                 os.rename(file_path, file_path + ".sha1")
+                files_processed += 1
         end_date = datetime.now()
         time_elapsed = end_date - start_date
-        print("Checksum upgrade complete. The operation took " + return_human_readable_time_elapsed(time_elapsed) + "\n")
+        print("Checksum upgrade complete. " + str(files_processed) + " checksum files(s) upgraded. The operation took " + return_human_readable_time_elapsed(time_elapsed) + "\n")
     else:
         print("No legacy BMChecksum files found.")
 
