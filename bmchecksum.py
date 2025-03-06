@@ -32,6 +32,7 @@ def help():
     print("\nCommands:")
     print("\n-c = Create checksums for all subdirectories in the base directory")
     print("-v = Verify file checksums in all subdirectories based on those found in the base directory")
+    print("-s = Verify file checksums in all direct subdirectories found in the base directory")
     print("-u = Upgrade checksums from checksum version 1.0 to the latest version (1.1)")
     print("-h = Help\n")
 
@@ -60,6 +61,8 @@ def main():
             print("Please provide a base directory name to verify checksums on\n")
         elif command == "-u":
             print("Please provide a base directory name to upgrade checksums on\n")
+        elif command == "-s":
+            print("Please provide a base directory name to verify checksums in all direct subdirectories in\n")
     else:
         command = sys.argv[1]
         base_directory = sys.argv[2]
@@ -69,6 +72,8 @@ def main():
             start_verification_process(base_directory)
         elif command == "-u":
             start_upgrade_process(base_directory)
+        elif command == "-s":
+            verify_all_checksums_in_all_direct_subdirectories(base_directory)
 
 def start_upgrade_process(base_directory):
 
@@ -114,6 +119,24 @@ def start_upgrade_process(base_directory):
     else:
         print("No legacy BMChecksum files found.")
 
+def verify_all_checksums_in_all_direct_subdirectories(base_directory):
+    
+    """
+    Verifies all checksums found in all direct subdirectories in sequence
+    :param base_directory: The base directory to walk through
+    """
+    # Read list of file and folders in base_directory
+    entries_list = os.listdir(base_directory)
+    dir_list = []
+    for entries in entries_list:
+        # If entries is a directory, add it to the list
+        if os.path.isdir(os.path.join(base_directory, entries)):
+            dir_list.append(entries)
+    # For each directory in the list, verify the checksums
+    for directory in dir_list:
+        print("Verifying files in directory: " + directory + "\n")
+        start_verification_process(os.path.join(base_directory, directory))
+
 def start_verification_process(base_directory):
 
     """
@@ -124,7 +147,6 @@ def start_verification_process(base_directory):
     # Check to see if the "bm11-md5sums and "bm11-sha1sums" directories exist
     if not os.path.exists(os.path.join(base_directory, "bm11-md5sums")) or not os.path.exists(os.path.join(base_directory, "bm11-sha1sums")):
         print("No verification data could be found. Aborting...\n")
-        sys.exit(1)
     else:
         # Store current date and time for later use
         start_date = datetime.now()
