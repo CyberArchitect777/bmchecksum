@@ -69,7 +69,7 @@ def main():
         if command == "-c":
             start_checksum_process(base_directory)
         elif command == "-v":
-            start_verification_process(base_directory)
+            start_verification_process(base_directory, False)
         elif command == "-u":
             start_upgrade_process(base_directory)
         elif command == "-s":
@@ -125,6 +125,8 @@ def verify_all_checksums_in_all_direct_subdirectories(base_directory):
     Verifies all checksums found in all direct subdirectories in sequence
     :param base_directory: The base directory to walk through
     """
+    # Store current date and time for later use
+    start_date = datetime.now()
     # Read list of file and folders in base_directory
     entries_list = os.listdir(base_directory)
     dir_list = []
@@ -135,21 +137,26 @@ def verify_all_checksums_in_all_direct_subdirectories(base_directory):
     # For each directory in the list, verify the checksums
     for directory in dir_list:
         print("Verifying files in directory: " + directory + "\n")
-        start_verification_process(os.path.join(base_directory, directory))
+        start_verification_process(os.path.join(base_directory, directory), True)
+    end_date = datetime.now()
+    time_elapsed = end_date - start_date
+    print("Verification of all direct subdirectories complete. Operation took " + return_human_readable_time_elapsed(time_elapsed) + "\n")
 
-def start_verification_process(base_directory):
+def start_verification_process(base_directory, omit_statistics):
 
     """
     Start the verification process on the base directory.
     :param base_directory: The base directory to walk through
+    :param omit_statistics: Whether to omit the statistics at the end of the verification process
     """
 
     # Check to see if the "bm11-md5sums and "bm11-sha1sums" directories exist
     if not os.path.exists(os.path.join(base_directory, "bm11-md5sums")) or not os.path.exists(os.path.join(base_directory, "bm11-sha1sums")):
         print("No verification data could be found. Aborting...\n")
     else:
-        # Store current date and time for later use
-        start_date = datetime.now()
+        # Store current date and time for later use if omit_statistics is False
+        if omit_statistics == False:
+            start_date = datetime.now()
         print("Verifying based on files and checksums available...\n")
         file_paths = create_file_list(base_directory)
         error_flag = False
@@ -215,16 +222,20 @@ def start_verification_process(base_directory):
                 print("* SHA-1 Checksum Available For Missing File: " + actual_file_path[2:])
                 processed[3] += 1
                 error_flag = True
-        end_date = datetime.now()
-        time_elapsed = end_date - start_date
-        if error_flag == True:
-            print("\nVerification complete. Operation took " + return_human_readable_time_elapsed(time_elapsed) + "\n")
-        else:
-            print("Verification complete. Operation took " + return_human_readable_time_elapsed(time_elapsed) + "\n")
-        print("Files processed: " + str(processed[0]))
-        print("MD5 checksums processed: " + str(processed[1]))
-        print("SHA-1 checksums processed: " + str(processed[2]))
-        print("Errors found: " + str(processed[3]) + "\n")
+        if omit_statistics == False:
+            end_date = datetime.now()
+            time_elapsed = end_date - start_date
+            if error_flag == True:
+                print("\nVerification complete. Operation took " + return_human_readable_time_elapsed(time_elapsed) + "\n")
+            else:
+                print("Verification complete. Operation took " + return_human_readable_time_elapsed(time_elapsed) + "\n")
+            print("Files processed: " + str(processed[0]))
+            print("MD5 checksums processed: " + str(processed[1]))
+            print("SHA-1 checksums processed: " + str(processed[2]))
+            print("Errors found: " + str(processed[3]) + "\n")
+        elif omit_statistics == True and error_flag == True:
+            # Insert a new line to make the display better
+            print("")
 
 def return_human_readable_time_elapsed(time_elapsed):
     
