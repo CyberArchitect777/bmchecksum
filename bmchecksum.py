@@ -30,7 +30,9 @@ def help():
     print("General usage:")
     print("\nbmchecksum <command> <base directory>")
     print("\nCommands:")
-    print("\n-c = Create checksums for all subdirectories in the base directory")
+    print("\n-c = Create all checksums for all subdirectories in the base directory")
+    print("-cm = Create only MD5 checksums for all subdirectories in the base directory")
+    print("-cs = Create only SHA-1 checksums for all subdirectories in the base directory")
     print("-v = Verify file checksums in all subdirectories based on those found in the base directory")
     print("-s = Verify file checksums in all direct subdirectories found in the base directory")
     print("-u = Upgrade checksums from checksum version 1.0 to the latest version (1.1)")
@@ -55,7 +57,7 @@ def main():
         if command == "-h":
             help()
             sys.exit(1)
-        elif command == "-c":
+        elif command == "-c" or command == "-cm" or command == "-cs":
             print("Please provide a base directory name to calculate checksums on\n")
         elif command == "-v":
             print("Please provide a base directory name to verify checksums on\n")
@@ -67,7 +69,11 @@ def main():
         command = sys.argv[1]
         base_directory = sys.argv[2]
         if command == "-c":
-            start_checksum_process(base_directory)
+            start_checksum_process(base_directory, 0)
+        elif command == "-cm":
+            start_checksum_process(base_directory, 1)
+        elif command == "-cs":
+            start_checksum_process(base_directory, 2)
         elif command == "-v":
             start_verification_process(base_directory, False)
         elif command == "-u":
@@ -274,13 +280,13 @@ def start_checksum_process(base_directory, mode):
     if not os.path.exists(os.path.join(base_directory, "bm11-md5sums")) and (mode == 0 or mode == 1):
         os.makedirs(os.path.join(base_directory, "bm11-md5sums"))
         print("MD5 checksum folder not found in starting directory. Creating new checksums for all discovered files...")
-    else:
+    elif mode == 0 or mode == 1:
         print("MD5 checksum folder found in starting directory. Adding checksums for new files only...")
         addition = True
     if not os.path.exists(os.path.join(base_directory, "bm11-sha1sums")) and (mode == 0 or mode == 2):
         os.makedirs(os.path.join(base_directory, "bm11-sha1sums"))
         print("SHA-1 checksum folder not found in starting directory. Creating new checksums for all discovered files...")
-    else:
+    elif mode == 0 or mode == 2:
         print("SHA-1 checksum folder found in starting directory. Adding checksums for new files only...")
         addition = True
     if addition == True:
