@@ -85,11 +85,11 @@ def main():
 
 def test_routine(base_directory):
     print("Base directory: " + base_directory)
+    # Get absolute path
+    print("Absolute path: " + os.path.abspath(base_directory))
     # Calculate relative path of the base directory
     relative_path = os.path.relpath(base_directory)
     print("Relative path: " + relative_path)
-    # Switch to base_directory
-    os.chdir(base_directory)
     # Go through every file and directory in the current path and return the relative paths of each
     for root, dirs, files in os.walk(base_directory):
         for file in files:
