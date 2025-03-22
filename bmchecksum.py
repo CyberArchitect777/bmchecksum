@@ -81,26 +81,9 @@ def main():
             start_upgrade_process(base_directory)
         elif command == "-s":
             verify_all_checksums_in_all_direct_subdirectories(base_directory)
-        elif command == "-t":
-            test_routine(base_directory)
         else:
             help()
-            sys.exit(1)
-
-def test_routine(base_directory):
-    print("Base directory: " + base_directory)
-    # Get absolute path
-    print("Absolute path: " + os.path.abspath(base_directory))
-    # Calculate relative path of the base directory
-    relative_path = os.path.relpath(base_directory)
-    print("Relative path: " + relative_path)
-    # Go through every file and directory in the current path and return the relative paths of each
-    for root, dirs, files in os.walk(base_directory):
-        for file in files:
-            print("File: " + os.path.relpath(os.path.join(root, file), base_directory))
-        for directory in dirs:
-            print("Directory: " + os.path.relpath(os.path.join(root, directory), base_directory))
-    
+            sys.exit(1)    
 
 def start_upgrade_process(base_directory):
 
