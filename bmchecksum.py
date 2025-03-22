@@ -68,22 +68,25 @@ def main():
     else:
         command = sys.argv[1]
         base_directory = sys.argv[2]
-        absolute_path = os.path.abspath(base_directory)
-        if command == "-c":
-            start_checksum_process(absolute_path, 0)
-        elif command == "-cm":
-            start_checksum_process(absolute_path, 1)
-        elif command == "-cs":
-            start_checksum_process(absolute_path, 2)
-        elif command == "-v":
-            start_verification_process(absolute_path, False)
-        elif command == "-u":
-            start_upgrade_process(base_directory)
-        elif command == "-s":
-            verify_all_checksums_in_all_direct_subdirectories(base_directory)
+        if not os.path.exists(base_directory):
+            print("Please provide a valid base directory path\n")
         else:
-            help()
-            sys.exit(1)    
+            absolute_path = os.path.abspath(base_directory)
+            if command == "-c":
+                start_checksum_process(absolute_path, 0)
+            elif command == "-cm":
+                start_checksum_process(absolute_path, 1)
+            elif command == "-cs":
+                start_checksum_process(absolute_path, 2)
+            elif command == "-v":
+                start_verification_process(absolute_path, False)
+            elif command == "-u":
+                start_upgrade_process(base_directory)
+            elif command == "-s":
+                verify_all_checksums_in_all_direct_subdirectories(base_directory)
+            else:
+                help()
+                sys.exit(1)
 
 def start_upgrade_process(base_directory):
 
