@@ -54,10 +54,7 @@ def main():
         sys.exit(1)
     elif len(sys.argv) == 2:
         command = sys.argv[1]
-        if command == "-h":
-            help()
-            sys.exit(1)
-        elif command == "-c" or command == "-cm" or command == "-cs":
+        if command == "-c" or command == "-cm" or command == "-cs":
             print("Please provide a base directory name to calculate checksums on\n")
         elif command == "-v":
             print("Please provide a base directory name to verify checksums on\n")
@@ -65,6 +62,9 @@ def main():
             print("Please provide a base directory name to upgrade checksums on\n")
         elif command == "-s":
             print("Please provide a base directory name to verify checksums in all direct subdirectories in\n")
+        else:
+            help()
+            sys.exit(1)
     else:
         command = sys.argv[1]
         base_directory = sys.argv[2]
@@ -83,6 +83,9 @@ def main():
             verify_all_checksums_in_all_direct_subdirectories(base_directory)
         elif command == "-t":
             test_routine(base_directory)
+        else:
+            help()
+            sys.exit(1)
 
 def test_routine(base_directory):
     print("Base directory: " + base_directory)
