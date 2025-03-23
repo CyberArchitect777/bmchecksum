@@ -33,6 +33,8 @@ However, to run the application in the current form, the following can be done.
 
 The GitHub repository is [here](https://github.com/CyberArchitect777/bmchecksum)
 
+The main development branch is located in the root directory. However, branches tagged in the versions/ directory contained stable editions. To date, no official releases have been made of the application.
+
 ## Technical
 
 ### Program construction
