@@ -14,9 +14,21 @@ The latest version of the original software application was compatible with chec
 
 ## Running The Application
 
-No official releases of the application have been created yet.
+### Latest stable release
 
-However, to run the application in the current form, the following can be done. 
+No packaged releases of the application have been created yet. However, the latest stable version (and indeed all versions of the application) can be found under the tags section of this repository here:-
+
+https://github.com/CyberArchitect777/bmchecksum/tags
+
+To run version 0.1.0, the standard Python 3 interpreter must be installed and available. The BMChecksum compressed archive should then be extracted to a new directory. The following command can then be run from this directory via the command-line:-
+
+`python3 bmchecksum.py`
+
+The help instructions given can then be followed to proceed further.
+
+### Latest source code
+
+To acquire and run the latest source code, the following can be done. 
 
 - If needed, download Git and install it.
 - If needed, download the standard Python 3 interpreter and install it.
@@ -32,6 +44,10 @@ However, to run the application in the current form, the following can be done.
 ## Repository
 
 The GitHub repository is [here](https://github.com/CyberArchitect777/bmchecksum)
+
+The main development branch is located in the root directory. However, branches tagged in the versions/ directory contained stable editions. All versions of this software are tagged and can also be acquired with Git. An example of how to do this with the v0.1.0 codebase is:-
+
+`git checkout v0.1.0`
 
 ## Technical
 
