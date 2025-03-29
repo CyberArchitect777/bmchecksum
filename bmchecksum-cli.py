@@ -40,7 +40,7 @@ def help():
 def main():
     
     """
-    The first function run upon program start
+    The first function run upon program start to provide the command-line interface
     """
     
     print("\nBMChecksum")
