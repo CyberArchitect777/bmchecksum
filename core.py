@@ -16,78 +16,9 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <https://www.gnu.org/licenses/>.
 """
 
-import sys
 import hashlib
 import os
 from datetime import datetime
-
-def help():
-    
-    """
-    Outputs help information to the user if asked for or if an invalid function is specified
-    """
-    
-    print("General usage:")
-    print("\nbmchecksum <command> <base directory>")
-    print("\nCommands:")
-    print("\n-c = Create all checksums for all subdirectories in the base directory")
-    print("-cm = Create only MD5 checksums for all subdirectories in the base directory")
-    print("-cs = Create only SHA-1 checksums for all subdirectories in the base directory")
-    print("-v = Verify file checksums in all subdirectories based on those found in the base directory")
-    print("-s = Verify file checksums in all direct subdirectories found in the base directory")
-    print("-u = Upgrade checksums from checksum version 1.0 to the latest version (1.1)")
-    print("-h = Help\n")
-
-def main():
-    
-    """
-    The first function run upon program start
-    """
-    
-    print("\nBMChecksum")
-    print("Version 0.1.0")
-    print("\nPython Edition")
-    print("By Barrie Millar")
-    print("A file hashing program to store and later verify the checksums of files\n")
-
-    if len(sys.argv) == 1:
-        help()
-        sys.exit(1)
-    elif len(sys.argv) == 2:
-        command = sys.argv[1]
-        if command == "-c" or command == "-cm" or command == "-cs":
-            print("Please provide a base directory name to calculate checksums on\n")
-        elif command == "-v":
-            print("Please provide a base directory name to verify checksums on\n")
-        elif command == "-u":
-            print("Please provide a base directory name to upgrade checksums on\n")
-        elif command == "-s":
-            print("Please provide a base directory name to verify checksums in all direct subdirectories in\n")
-        else:
-            help()
-            sys.exit(1)
-    else:
-        command = sys.argv[1]
-        base_directory = sys.argv[2]
-        if not os.path.exists(base_directory):
-            print("Please provide a valid base directory path\n")
-        else:
-            absolute_path = os.path.abspath(base_directory)
-            if command == "-c":
-                start_checksum_process(absolute_path, 0)
-            elif command == "-cm":
-                start_checksum_process(absolute_path, 1)
-            elif command == "-cs":
-                start_checksum_process(absolute_path, 2)
-            elif command == "-v":
-                start_verification_process(absolute_path, False)
-            elif command == "-u":
-                start_upgrade_process(base_directory)
-            elif command == "-s":
-                verify_all_checksums_in_all_direct_subdirectories(base_directory)
-            else:
-                help()
-                sys.exit(1)
 
 def start_upgrade_process(base_directory):
 
@@ -107,9 +38,9 @@ def start_upgrade_process(base_directory):
         files_processed = 0
         # Check for existing MD5 current version checksum directories
         if os.path.exists(os.path.join(base_directory, "bm11-md5sums")):
-            print("Current version of MD5 checksum data found. Skipping MD5 checksum upgrade...\n")
+            output_message("Current version of MD5 checksum data found. Skipping MD5 checksum upgrade...\n")
         elif os.path.exists(os.path.join(base_directory, "bm-md5sums")):
-            print("Upgrading legacy MD5 checksums to current format...\n")
+            output_message("Upgrading legacy MD5 checksums to current format...\n")
             # Rename the bm-md5sums directory to bm11-md5sums
             os.rename(os.path.join(base_directory, "bm-md5sums"), os.path.join(base_directory, "bm11-md5sums"))
             file_paths = create_file_list(os.path.join(base_directory, "bm11-md5sums"))
@@ -119,9 +50,9 @@ def start_upgrade_process(base_directory):
                 files_processed += 1
         # Check for existing SHA-1 current version checksum directories
         if os.path.exists(os.path.join(base_directory, "bm11-sha1sums")):
-            print("Current version of SHA-1 checksum data found. Skipping SHA-1 checksum upgrade...\n")
+            output_message("Current version of SHA-1 checksum data found. Skipping SHA-1 checksum upgrade...\n")
         elif os.path.exists(os.path.join(base_directory, "bm-sha1sums")):
-            print("Upgrading legacy SHA-1 checksums to current format...\n")
+            output_message("Upgrading legacy SHA-1 checksums to current format...\n")
             os.rename(os.path.join(base_directory, "bm-sha1sums"), os.path.join(base_directory, "bm11-sha1sums"))
             file_paths = create_file_list(os.path.join(base_directory, "bm11-sha1sums"))
             for file_path in file_paths:
@@ -129,9 +60,9 @@ def start_upgrade_process(base_directory):
                 files_processed += 1
         end_date = datetime.now()
         time_elapsed = end_date - start_date
-        print("Checksum upgrade complete. " + str(files_processed) + " checksum files(s) upgraded. The operation took " + return_human_readable_time_elapsed(time_elapsed) + "\n")
+        output_message("Checksum upgrade complete. " + str(files_processed) + " checksum files(s) upgraded. The operation took " + return_human_readable_time_elapsed(time_elapsed) + "\n")
     else:
-        print("No legacy BMChecksum files found.")
+        output_message("No legacy BMChecksum files found.")
 
 def verify_all_checksums_in_all_direct_subdirectories(base_directory):
     
@@ -150,11 +81,11 @@ def verify_all_checksums_in_all_direct_subdirectories(base_directory):
             dir_list.append(entries)
     # For each directory in the list, verify the checksums
     for directory in dir_list:
-        print("Verifying files in directory: " + directory + "\n")
+        output_message("Verifying files in directory: " + directory + "\n")
         start_verification_process(os.path.join(base_directory, directory), True)
     end_date = datetime.now()
     time_elapsed = end_date - start_date
-    print("Verification of all direct subdirectories complete. Operation took " + return_human_readable_time_elapsed(time_elapsed) + "\n")
+    output_message("Verification of all direct subdirectories complete. Operation took " + return_human_readable_time_elapsed(time_elapsed) + "\n")
 
 def start_verification_process(absolute_path, omit_statistics):
 
@@ -174,12 +105,12 @@ def start_verification_process(absolute_path, omit_statistics):
         sha1_present = 1
     # If neither checksum folder is present, abort the verification process        
     if md5_present == 0 and sha1_present == 0:
-        print("No verification data could be found. Aborting...\n")
+        output_message("No verification data could be found. Aborting...\n")
     else:
         # Store current date and time for later use if omit_statistics is False
         if omit_statistics == False:
             start_date = datetime.now()
-        print("Verifying based on files and checksums available...\n")
+        output_message("Verifying based on files and checksums available...\n")
         file_paths = create_file_list(absolute_path)
         error_flag = False
         # Create processed list to hold a count of actual, md5 and sha1 files as well as a count of all errors
@@ -196,7 +127,7 @@ def start_verification_process(absolute_path, omit_statistics):
             if md5_present == 1:
                 # Check to see if the md5 checksum file exists and report it if not.
                 if not os.path.exists(os.path.join(absolute_path, "bm11-md5sums", relative_path + ".md5")):
-                    print("* MD5 checksum is missing for file: " + os.path.relpath(file_path, absolute_path))
+                    output_message("* MD5 checksum is missing for file: " + os.path.relpath(file_path, absolute_path))
                     processed[3] += 1
                     error_flag = True
                 else:
@@ -207,14 +138,14 @@ def start_verification_process(absolute_path, omit_statistics):
                         # Read md5 checksum after stripping newline character for compatibility with Bash version of program
                         checksum_md5 = (md5_file.read()).rstrip()
                         if file_md5 != checksum_md5:
-                            print("* File does not match MD5 checksum: " + os.path.relpath(file_path, absolute_path))
+                            output_message("* File does not match MD5 checksum: " + os.path.relpath(file_path, absolute_path))
                             processed[3] += 1
                             error_flag = True
                         md5_file.close()
             if sha1_present == 1:
                 # Check to see if the sha1 checksum file exists and report it if not.
                 if not os.path.exists(os.path.join(absolute_path, "bm11-sha1sums", relative_path + ".sha1")):
-                    print("* SHA-1 checksum is missing for file: " + os.path.relpath(file_path, absolute_path))
+                    output_message("* SHA-1 checksum is missing for file: " + os.path.relpath(file_path, absolute_path))
                     processed[3] += 1
                     error_flag = True
                 else:
@@ -225,7 +156,7 @@ def start_verification_process(absolute_path, omit_statistics):
                         # Read sha1 checksum after stripping newline character for compatibility with Bash version of program
                         checksum_sha1 = (sha1_file.read()).rstrip()
                     if file_sha1 != checksum_sha1:
-                        print("* File does not match SHA-1 checksum: " + os.path.relpath(file_path, absolute_path))           
+                        output_message("* File does not match SHA-1 checksum: " + os.path.relpath(file_path, absolute_path))           
                         processed[3] += 1
                         error_flag = True
                     sha1_file.close()
@@ -235,7 +166,7 @@ def start_verification_process(absolute_path, omit_statistics):
                 # Remove bm11-md5sums from the beginning and .md5 from the end of the path
                 actual_file_path = os.path.relpath(md5_file_path, absolute_path)
                 if not os.path.exists(os.path.join(absolute_path, actual_file_path[13:-4])):
-                    print("* MD5 Checksum Available For Missing File: " + actual_file_path[13:-4])
+                    output_message("* MD5 Checksum Available For Missing File: " + actual_file_path[13:-4])
                     processed[3] += 1
                     error_flag = True
         if sha1_present == 1:
@@ -243,23 +174,23 @@ def start_verification_process(absolute_path, omit_statistics):
             for sha1_file_path in sha1_file_paths:
                 actual_file_path = os.path.relpath(sha1_file_path, absolute_path)
                 if not os.path.exists(os.path.join(absolute_path, actual_file_path[14:-5])):
-                    print("* SHA-1 Checksum Available For Missing File: " + actual_file_path[14:-5])
+                    output_message("* SHA-1 Checksum Available For Missing File: " + actual_file_path[14:-5])
                     processed[3] += 1
                     error_flag = True
         if omit_statistics == False:
             end_date = datetime.now()
             time_elapsed = end_date - start_date
             if error_flag == True:
-                print("\nVerification complete. Operation took " + return_human_readable_time_elapsed(time_elapsed) + "\n")
+                output_message("\nVerification complete. Operation took " + return_human_readable_time_elapsed(time_elapsed) + "\n")
             else:
-                print("Verification complete. Operation took " + return_human_readable_time_elapsed(time_elapsed) + "\n")
-            print("Files processed: " + str(processed[0]))
-            print("MD5 checksums processed: " + str(processed[1]))
-            print("SHA-1 checksums processed: " + str(processed[2]))
-            print("Errors found: " + str(processed[3]) + "\n")
+                output_message("Verification complete. Operation took " + return_human_readable_time_elapsed(time_elapsed) + "\n")
+            output_message("Files processed: " + str(processed[0]))
+            output_message("MD5 checksums processed: " + str(processed[1]))
+            output_message("SHA-1 checksums processed: " + str(processed[2]))
+            output_message("Errors found: " + str(processed[3]) + "\n")
         elif omit_statistics == True and error_flag == True:
             # Insert a new line to make the display better
-            print("")
+            output_message("")
 
 def return_human_readable_time_elapsed(time_elapsed):
     
@@ -297,22 +228,22 @@ def start_checksum_process(absolute_path, mode):
     # Create the directories "bm11-md5sums" and "bm11-sha1sums" if they don't exist
     if not os.path.exists(os.path.join(absolute_path, "bm11-md5sums")) and (mode == 0 or mode == 1):
         os.makedirs(os.path.join(absolute_path, "bm11-md5sums"))
-        print("MD5 checksum folder not found in starting directory. Creating new checksums for all discovered files...")
+        output_message("MD5 checksum folder not found in starting directory. Creating new checksums for all discovered files...")
     elif mode == 0 or mode == 1:
-        print("MD5 checksum folder found in starting directory. Adding checksums for new files only...")
+        output_message("MD5 checksum folder found in starting directory. Adding checksums for new files only...")
         addition = True
     if not os.path.exists(os.path.join(absolute_path, "bm11-sha1sums")) and (mode == 0 or mode == 2):
         os.makedirs(os.path.join(absolute_path, "bm11-sha1sums"))
-        print("SHA-1 checksum folder not found in starting directory. Creating new checksums for all discovered files...")
+        output_message("SHA-1 checksum folder not found in starting directory. Creating new checksums for all discovered files...")
     elif mode == 0 or mode == 2:
-        print("SHA-1 checksum folder found in starting directory. Adding checksums for new files only...")
+        output_message("SHA-1 checksum folder found in starting directory. Adding checksums for new files only...")
         addition = True
     if addition == True:
-        print("Existing checksum will not be replaced.")
+        output_message("Existing checksum will not be replaced.")
     file_paths = create_file_list(absolute_path)
     # Store current date and time for later use
     start_date = datetime.now()
-    print("\nCalculating new checksums...")
+    output_message("\nCalculating new checksums...")
     files_processed = 0
     for file_path in file_paths:
         checksum_written = False
@@ -344,7 +275,7 @@ def start_checksum_process(absolute_path, mode):
             files_processed += 1
     end_date = datetime.now()
     time_elapsed = end_date - start_date
-    print("\nChecksum calculation complete. " + str(files_processed) + " files(s) checksummed. Operation took " + return_human_readable_time_elapsed(time_elapsed) + "\n")
+    output_message("\nChecksum calculation complete. " + str(files_processed) + " files(s) checksummed. Operation took " + return_human_readable_time_elapsed(time_elapsed) + "\n")
 
 def create_file_list(absolute_path):
     
@@ -384,10 +315,12 @@ def calculate_checksum(file_path, algorithm):
             file_hash.update(file_chunk)
     return file_hash.hexdigest()
 
-if __name__ == "__main__":
-    
+def output_message(message, output_destination=print):
+
     """
-    Runs the main function if this code is being run directly.
+    Output a message to the console or to an alternative passed destination.
+    :param message: The message to output
+    :param callback: The function to call to output the message
     """
-    
-    main()
+
+    output_destination(message)
