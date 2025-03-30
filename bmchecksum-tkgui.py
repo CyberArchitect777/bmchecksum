@@ -39,29 +39,37 @@ def main():
 
     # Output display section
 
-    output_display = scrolledtext.ScrolledText(main_window, height=4, wrap=tk.WORD)
+    output_display = scrolledtext.ScrolledText(main_window, height=12, wrap=tk.WORD)
     output_display.pack(fill=tk.BOTH, padx=10, pady=5, expand=True)
 
-    # Directory input section
+    # Interface controls section with a documentation label, a row with directory entry and a buttons panel
 
-    directory_frame = tk.Frame(main_window)
-    directory_frame.pack(fill=tk.X, padx=10, pady=15)
-    tk.Label(directory_frame, text="Directory:").pack(side=tk.LEFT, padx=5)
-    directory_entry = tk.Entry(directory_frame)
-    directory_entry.pack(side=tk.LEFT, fill=tk.X, expand=True, padx=5)
-    browse_button = tk.Button(directory_frame, text="Browse", command=lambda: browse_directory(directory_entry))
-    browse_button.pack(side=tk.RIGHT, padx=5)
-
-    # Button section in a grid
-
-    button_frame = tk.Frame(main_window)
-    button_frame.pack(fill=tk.BOTH, padx=10, pady=15, expand=True)
-    tk.Button(button_frame, text="Calculate All Checksums").grid(row=0, column=0, padx=5, pady=5, sticky=tk.EW)
-    tk.Button(button_frame, text="Calculate MD5 Checksums").grid(row=0, column=1, padx=5, pady=5, sticky=tk.EW)
-    tk.Button(button_frame, text="Calculate SHA-1 Checksums").grid(row=1, column=0, padx=5, pady=5, sticky=tk.EW)
-    tk.Button(button_frame, text="Verify Checksums").grid(row=1, column=1, padx=5, pady=5, sticky=tk.EW)
-    tk.Button(button_frame, text="Verify Checksums In All Direct Subfolders").grid(row=2, column=0, padx=5, pady=5, sticky=tk.EW)
-    tk.Button(button_frame, text="Upgrade Legacy Checksums").grid(row=2, column=1, padx=5, pady=5, sticky=tk.EW)
+    controls_frame = tk.Frame(main_window)
+    controls_frame.pack(fill=tk.X, padx=10, pady=5)
+    doc_display = tk.Label(controls_frame, text="Welcome to BMChecksum. Please select the required directory and then the calculate, verify or upgrade buttons to start.")
+    doc_display.pack(fill=tk.X, padx=10, pady=5)
+    directory_frame = tk.Frame(controls_frame)
+    directory_frame.pack(fill=tk.X, padx=10, pady=5, expand=True)
+    # Ensure the middle element stretches to take up more of the available space
+    directory_frame.grid_columnconfigure(0, weight=1)
+    directory_frame.grid_columnconfigure(1, weight=3)
+    directory_frame.grid_columnconfigure(2, weight=1)
+    tk.Label(directory_frame, text="Directory:").grid(row=0, column=0, padx=5, pady=5)
+    tk.Entry(directory_frame).grid(row=0, column=1, padx=5, pady=5, sticky=tk.EW)
+    tk.Button(directory_frame, text="Browse", command=lambda: browse_directory(directory_frame)).grid(row=0, column=2, padx=5, pady=5)
+    button_frame = tk.Frame(controls_frame)
+    button_frame.pack(fill=tk.X, padx=10, pady=5, expand=True)
+    # Set the button panel to have even weights for all grid rows and columns
+    for number in range(3):
+        button_frame.grid_rowconfigure(number, weight=1)
+    for number in range(2):
+        button_frame.grid_columnconfigure(number, weight=1)
+    tk.Button(button_frame, width=35, text="Calculate All Checksums").grid(row=0, column=0, padx=5, pady=5)
+    tk.Button(button_frame, width=35, text="Calculate MD5 Checksums").grid(row=0, column=1, padx=5, pady=5)
+    tk.Button(button_frame, width=35, text="Calculate SHA-1 Checksums").grid(row=1, column=0, padx=5, pady=5)
+    tk.Button(button_frame, width=35, text="Verify Checksums").grid(row=1, column=1, padx=5, pady=5)
+    tk.Button(button_frame, width=35, text="Verify Checksums In All Direct Subfolders").grid(row=2, column=0, padx=5, pady=5)
+    tk.Button(button_frame, width=35, text="Upgrade Legacy Checksums").grid(row=2, column=1, padx=5, pady=5)
 
     # Start the Tkinter event loop
     
