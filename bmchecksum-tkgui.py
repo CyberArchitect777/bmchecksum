@@ -20,11 +20,16 @@ import core as bmc
 import tkinter as tk
 from tkinter import filedialog, scrolledtext
 
-def browse_directory(entry):
-        directory = filedialog.askdirectory()
-        if directory:
-            entry.delete(0, tk.END)
-            entry.insert(0, directory)
+def browse_directory(directory_textbox):
+    """
+    Opens a file dialog to select a directory and updates the directory_textbox with the selected path.
+    :param directory_textbox: The Entry widget to update with the selected directory path
+    """
+    
+    checksum_directory = filedialog.askdirectory(title="Select Directory")
+    if checksum_directory:
+        directory_textbox.delete(0, tk.END)
+        directory_textbox.insert(0, checksum_directory)
 
 def main():
     """
@@ -57,8 +62,9 @@ def main():
     directory_frame = tk.Frame(main_window)
     directory_frame.grid(row=5, column=0, padx=5, pady=5, sticky=tk.EW)
     tk.Label(directory_frame, text="Directory:").pack(side=tk.LEFT, padx=5, pady=5)
-    tk.Button(directory_frame, text="Browse", command=lambda: browse_directory(output_display)).pack(side=tk.RIGHT, padx=5, pady=5)
-    tk.Entry(directory_frame).pack(padx=5, pady=5, fill=tk.X, expand=True)
+    directory_textbox = tk.Entry(directory_frame)
+    tk.Button(directory_frame, text="Browse", command=lambda: browse_directory(directory_textbox)).pack(side=tk.RIGHT, padx=5, pady=5)
+    directory_textbox.pack(padx=5, pady=5, fill=tk.X, expand=True)
     button_frame = tk.Frame(main_window)
     button_frame.grid(row=6, column=0, rowspan=3, padx=5, pady=5, sticky=tk.NSEW)
     for cell in range(3):
