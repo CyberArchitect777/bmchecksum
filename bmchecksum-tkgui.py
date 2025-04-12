@@ -59,12 +59,18 @@ def main():
     doc_display = tk.Label(main_window, text="Welcome to BMChecksum. Please select the required directory and then the calculate, verify or upgrade buttons to start.", wraplength=main_window.winfo_width() - 20, justify="center")
     main_window.bind("<Configure>", lambda event: doc_display.config(wraplength=event.width - 20))
     doc_display.grid(row=4, column=0, padx=5, pady=5, sticky=tk.EW)    
+
+    # Directory selection panel
+
     directory_frame = tk.Frame(main_window)
     directory_frame.grid(row=5, column=0, padx=5, pady=5, sticky=tk.EW)
     tk.Label(directory_frame, text="Directory:").pack(side=tk.LEFT, padx=5, pady=5)
     directory_textbox = tk.Entry(directory_frame)
     tk.Button(directory_frame, text="Browse", command=lambda: browse_directory(directory_textbox)).pack(side=tk.RIGHT, padx=5, pady=5)
     directory_textbox.pack(padx=5, pady=5, fill=tk.X, expand=True)
+
+    # Button panel
+
     button_frame = tk.Frame(main_window)
     button_frame.grid(row=6, column=0, rowspan=3, padx=5, pady=5, sticky=tk.NSEW)
     for cell in range(3):
