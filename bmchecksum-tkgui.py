@@ -35,7 +35,7 @@ def main():
 
     main_window = tk.Tk()
     main_window.title("BMChecksum version 0.2.0")
-    main_window.geometry("800x400")
+    main_window.geometry("640x480")
 
     # Setting main interface row and column weights to 1
 
