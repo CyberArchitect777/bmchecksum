@@ -213,7 +213,7 @@ def return_human_readable_time_elapsed(time_elapsed):
     else:
         return time_elapsed[2] + " seconds."
 
-def start_checksum_process(absolute_path, mode):
+def start_checksum_process(absolute_path, mode, message_destination=print):
     
     """
     Start the checksumming process on the base directory.
@@ -228,22 +228,22 @@ def start_checksum_process(absolute_path, mode):
     # Create the directories "bm11-md5sums" and "bm11-sha1sums" if they don't exist
     if not os.path.exists(os.path.join(absolute_path, "bm11-md5sums")) and (mode == 0 or mode == 1):
         os.makedirs(os.path.join(absolute_path, "bm11-md5sums"))
-        output_message("MD5 checksum folder not found in starting directory. Creating new checksums for all discovered files...")
+        output_message("MD5 checksum folder not found in starting directory. Creating new checksums for all discovered files...", message_destination)
     elif mode == 0 or mode == 1:
-        output_message("MD5 checksum folder found in starting directory. Adding checksums for new files only...")
+        output_message("MD5 checksum folder found in starting directory. Adding checksums for new files only...", message_destination)
         addition = True
     if not os.path.exists(os.path.join(absolute_path, "bm11-sha1sums")) and (mode == 0 or mode == 2):
         os.makedirs(os.path.join(absolute_path, "bm11-sha1sums"))
-        output_message("SHA-1 checksum folder not found in starting directory. Creating new checksums for all discovered files...")
+        output_message("SHA-1 checksum folder not found in starting directory. Creating new checksums for all discovered files...", message_destination)
     elif mode == 0 or mode == 2:
-        output_message("SHA-1 checksum folder found in starting directory. Adding checksums for new files only...")
+        output_message("SHA-1 checksum folder found in starting directory. Adding checksums for new files only...", message_destination)
         addition = True
     if addition == True:
-        output_message("Existing checksum will not be replaced.")
+        output_message("Existing checksum will not be replaced.", message_destination)
     file_paths = create_file_list(absolute_path)
     # Store current date and time for later use
     start_date = datetime.now()
-    output_message("\nCalculating new checksums...")
+    output_message("\nCalculating new checksums...", message_destination)
     files_processed = 0
     for file_path in file_paths:
         checksum_written = False
@@ -275,7 +275,7 @@ def start_checksum_process(absolute_path, mode):
             files_processed += 1
     end_date = datetime.now()
     time_elapsed = end_date - start_date
-    output_message("\nChecksum calculation complete. " + str(files_processed) + " files(s) checksummed. Operation took " + return_human_readable_time_elapsed(time_elapsed) + "\n")
+    output_message("\nChecksum calculation complete. " + str(files_processed) + " files(s) checksummed. Operation took " + return_human_readable_time_elapsed(time_elapsed) + "\n", message_destination)
 
 def create_file_list(absolute_path):
     

@@ -31,6 +31,26 @@ def browse_directory(directory_textbox):
         directory_textbox.delete(0, tk.END)
         directory_textbox.insert(0, checksum_directory)
 
+
+def enclosed_output_display(output_display):
+    """
+    This function passes in the output_display variable to ensure any 
+    internal functions can access it. It has been done to avoid global
+    variable use
+    :param output_display: The scrolled text widget to display output
+    """
+
+    def update_output_display(message):
+        """
+        Updates the output display with the given message.
+        :param message: The message to display in the output area
+        """
+        
+        output_display.insert(tk.END, message + "\n")
+        output_display.see(tk.END)  # Scroll to the end of the text area
+
+    return update_output_display
+
 def main():
     """
     The first function run upon program start to create the main application window
@@ -40,7 +60,7 @@ def main():
 
     main_window = tk.Tk()
     main_window.title("BMChecksum version 0.2.0")
-    main_window.geometry("640x480")
+    main_window.geometry("725x480")
 
     # Setting main interface row and column weights to 1
 
@@ -78,7 +98,7 @@ def main():
         if cell < 2:
             button_frame.grid_columnconfigure(cell, weight=1)
     # Button width set to 35 pixels minimum
-    tk.Button(button_frame, width=35, text="Calculate All Checksums").grid(row=0, column=0, padx=5, pady=5, sticky=tk.EW)
+    tk.Button(button_frame, width=35, text="Calculate All Checksums", command=lambda: bmc.start_checksum_process(directory_textbox.get(), 0, enclosed_output_display(output_display))).grid(row=0, column=0, padx=5, pady=5, sticky=tk.EW)
     tk.Button(button_frame, width=35, text="Calculate MD5 Checksums").grid(row=0, column=1, padx=5, pady=5, sticky=tk.EW)
     tk.Button(button_frame, width=35, text="Calculate SHA-1 Checksums").grid(row=1, column=0, padx=5, pady=5, sticky=tk.EW)
     tk.Button(button_frame, width=35, text="Verify Checksums").grid(row=1, column=1, padx=5, pady=5, sticky=tk.EW)
