@@ -116,11 +116,11 @@ def main():
     # Button list for later access. Width set to 35 pixels minimum
     buttons = [
     tk.Button(button_frame, width=35, text="Calculate All Checksums", command=lambda: bmc.start_checksum_process(directory_textbox.get(), 0, enclosed_output_display(output_display))),
-    tk.Button(button_frame, width=35, text="Calculate MD5 Checksums"),
-    tk.Button(button_frame, width=35, text="Calculate SHA-1 Checksums"),
-    tk.Button(button_frame, width=35, text="Verify Checksums"),
-    tk.Button(button_frame, width=35, text="Verify Checksums In All Direct Subfolders"),
-    tk.Button(button_frame, width=35, text="Upgrade Legacy Checksums"),
+    tk.Button(button_frame, width=35, text="Calculate MD5 Checksums", command=lambda: bmc.start_checksum_process(directory_textbox.get(), 1, enclosed_output_display(output_display))),
+    tk.Button(button_frame, width=35, text="Calculate SHA-1 Checksums", command=lambda: bmc.start_checksum_process(directory_textbox.get(), 2, enclosed_output_display(output_display))),
+    tk.Button(button_frame, width=35, text="Verify Checksums", command=lambda: bmc.start_verification_process(directory_textbox.get(), False, enclosed_output_display(output_display))),
+    tk.Button(button_frame, width=35, text="Verify Checksums In All Direct Subfolders", command=lambda: bmc.verify_all_checksums_in_all_direct_subdirectories(directory_textbox.get(), enclosed_output_display(output_display))),
+    tk.Button(button_frame, width=35, text="Upgrade Legacy Checksums", command=lambda: bmc.start_upgrade_process(directory_textbox.get(), enclosed_output_display(output_display))),
     ]
 
     buttons[0].grid(row=0, column=0, padx=5, pady=5, sticky=tk.EW)
