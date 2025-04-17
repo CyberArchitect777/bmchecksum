@@ -19,6 +19,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 import core as bmc
 import tkinter as tk
 from tkinter import filedialog, scrolledtext
+import os
 
 def browse_directory(directory_textbox):
     """
@@ -28,6 +29,8 @@ def browse_directory(directory_textbox):
     
     checksum_directory = filedialog.askdirectory(title="Select Directory")
     if checksum_directory:
+        if os.name == 'nt':  # Check if the operating system is Windows
+            checksum_directory = checksum_directory.replace("/", "\\")  # Ensure Windows standard paths
         directory_textbox.delete(0, tk.END)
         directory_textbox.insert(0, checksum_directory)
 
