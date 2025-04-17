@@ -45,9 +45,8 @@ def enclosed_output_display(output_display):
         Updates the output display with the given message.
         :param message: The message to display in the output area
         """
-        
         output_display.insert(tk.END, message + "\n")
-        output_display.see(tk.END)  # Scroll to the end of the text area
+        output_display.update_idletasks()  # Force the UI to update immediately
 
     return update_output_display
 
