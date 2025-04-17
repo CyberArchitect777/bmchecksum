@@ -53,6 +53,20 @@ def enclosed_output_display(output_display):
 
     return update_output_display
 
+def validate_directory(directory_textbox, buttons):
+    """
+    Validates the directory path in the directory_textbox and enables/disables buttons accordingly.
+    :param directory_textbox: The Entry widget containing the directory path
+    :param buttons: A list of button widgets to enable/disable
+    """
+    directory = directory_textbox.get()
+    if os.path.isdir(directory):  # Check if the path is a valid directory
+        for button in buttons:
+            button.config(state=tk.NORMAL)  # Enable buttons
+    else:
+        for button in buttons:
+            button.config(state=tk.DISABLED)  # Disable buttons
+
 def main():
     """
     The first function run upon program start to create the main application window
@@ -99,13 +113,30 @@ def main():
         button_frame.grid_rowconfigure(cell, weight=1)
         if cell < 2:
             button_frame.grid_columnconfigure(cell, weight=1)
-    # Button width set to 35 pixels minimum
-    tk.Button(button_frame, width=35, text="Calculate All Checksums", command=lambda: bmc.start_checksum_process(directory_textbox.get(), 0, enclosed_output_display(output_display))).grid(row=0, column=0, padx=5, pady=5, sticky=tk.EW)
-    tk.Button(button_frame, width=35, text="Calculate MD5 Checksums").grid(row=0, column=1, padx=5, pady=5, sticky=tk.EW)
-    tk.Button(button_frame, width=35, text="Calculate SHA-1 Checksums").grid(row=1, column=0, padx=5, pady=5, sticky=tk.EW)
-    tk.Button(button_frame, width=35, text="Verify Checksums").grid(row=1, column=1, padx=5, pady=5, sticky=tk.EW)
-    tk.Button(button_frame, width=35, text="Verify Checksums In All Direct Subfolders").grid(row=2, column=0, padx=5, pady=5, sticky=tk.EW)
-    tk.Button(button_frame, width=35, text="Upgrade Legacy Checksums").grid(row=2, column=1, padx=5, pady=5, sticky=tk.EW)
+    # Button list for later access. Width set to 35 pixels minimum
+    buttons = [
+    tk.Button(button_frame, width=35, text="Calculate All Checksums", command=lambda: bmc.start_checksum_process(directory_textbox.get(), 0, enclosed_output_display(output_display))),
+    tk.Button(button_frame, width=35, text="Calculate MD5 Checksums"),
+    tk.Button(button_frame, width=35, text="Calculate SHA-1 Checksums"),
+    tk.Button(button_frame, width=35, text="Verify Checksums"),
+    tk.Button(button_frame, width=35, text="Verify Checksums In All Direct Subfolders"),
+    tk.Button(button_frame, width=35, text="Upgrade Legacy Checksums"),
+    ]
+
+    buttons[0].grid(row=0, column=0, padx=5, pady=5, sticky=tk.EW)
+    buttons[1].grid(row=0, column=1, padx=5, pady=5, sticky=tk.EW)
+    buttons[2].grid(row=1, column=0, padx=5, pady=5, sticky=tk.EW)
+    buttons[3].grid(row=1, column=1, padx=5, pady=5, sticky=tk.EW)
+    buttons[4].grid(row=2, column=0, padx=5, pady=5, sticky=tk.EW)
+    buttons[5].grid(row=2, column=1, padx=5, pady=5, sticky=tk.EW)
+
+    # Disable buttons initially
+    for button in buttons:
+        button.config(state=tk.DISABLED)
+
+    directory_textbox_var = tk.StringVar()
+    directory_textbox_var.trace_add("write", lambda *args: validate_directory(directory_textbox, buttons))
+    directory_textbox.config(textvariable=directory_textbox_var)
 
     # Start the Tkinter event loop
     
