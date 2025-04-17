@@ -82,7 +82,7 @@ def verify_all_checksums_in_all_direct_subdirectories(base_directory, message_de
     # For each directory in the list, verify the checksums
     for directory in dir_list:
         output_message("Verifying files in directory: " + directory + "\n", message_destination)
-        start_verification_process(os.path.join(base_directory, directory), True)
+        start_verification_process(os.path.join(base_directory, directory), True, message_destination)
     end_date = datetime.now()
     time_elapsed = end_date - start_date
     output_message("Verification of all direct subdirectories complete. Operation took " + return_human_readable_time_elapsed(time_elapsed) + "\n", message_destination)
