@@ -76,6 +76,7 @@ In version 1.0, BMChecksum stored checksum files in the base directory being che
 ## Credits
 
 - Github Copilot for rapid development.
+- ChatGPT for technical assistance and image generation.
 
 ## License
 
