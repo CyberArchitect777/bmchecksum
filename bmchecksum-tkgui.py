@@ -78,6 +78,14 @@ def main():
     main_window.title("BMChecksum version 0.2.0")
     main_window.geometry("725x480")
 
+    # Add PNG image as an application icon
+    
+    try:
+        icon_path = os.path.join(os.path.dirname(__file__), "assets" + os.sep + "images" + os.sep + "mainicon.png")
+        main_window.iconphoto(False, tk.PhotoImage(file=icon_path))
+    except Exception as e:
+        print(f"Error loading icon: {e}")
+
     # Setting main interface row and column weights to 1
 
     for row in range(4):
