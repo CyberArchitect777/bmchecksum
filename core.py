@@ -193,7 +193,7 @@ def start_verification_process(absolute_path, omit_statistics, message_destinati
                     # Remove bm11-md5sums from the beginning and .md5 from the end of the path
                     actual_file_path = os.path.relpath(md5_file_path, absolute_path)
                     if not os.path.exists(os.path.join(absolute_path, actual_file_path[13:-4])):
-                        output_message("* MD5 Checksum Available For Missing File: " + actual_file_path[13:-4], message_destination)
+                        output_message("* MD5 checksum available for missing file: " + actual_file_path[13:-4], message_destination)
                         processed[3] += 1
                         error_flag = True
             if sha1_present == 1:
@@ -201,7 +201,7 @@ def start_verification_process(absolute_path, omit_statistics, message_destinati
                 for sha1_file_path in sha1_file_paths:
                     actual_file_path = os.path.relpath(sha1_file_path, absolute_path)
                     if not os.path.exists(os.path.join(absolute_path, actual_file_path[14:-5])):
-                        output_message("* SHA-1 Checksum Available For Missing File: " + actual_file_path[14:-5], message_destination)
+                        output_message("* SHA-1 checksum available for missing file: " + actual_file_path[14:-5], message_destination)
                         processed[3] += 1
                         error_flag = True
             if omit_statistics == False:
