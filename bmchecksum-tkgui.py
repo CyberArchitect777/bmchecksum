@@ -69,7 +69,7 @@ def validate_directory(directory_textbox, buttons):
 
 def main():
     """
-    The first function run upon program start to create the main application window
+    The first function run upon program start to create the main application window using Tkinter
     """
 
     # Create the main application window
