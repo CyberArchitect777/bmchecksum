@@ -23,6 +23,8 @@ from kivy.uix.textinput import TextInput
 from kivy.uix.label import Label
 from kivy.uix.scrollview import ScrollView
 
+from plyer import filechooser
+
 class BMChecksumGUI(App):
 
     def build(self):
@@ -51,25 +53,51 @@ class BMChecksumGUI(App):
         # Directory selection panel
         
         dir_layout = GridLayout(cols=2)
-        dir_input = TextInput(hint_text="Select directory", size_hint_x=9, height=20)
+        self.dir_input = TextInput(hint_text="Select directory", size_hint_x=9, height=20)
         browse_button = Button(text="Browse", size_hint_x=1, height=20)
-        dir_layout.add_widget(dir_input)
-        dir_layout.add_widget(browse_button)   
+        browse_button.bind(on_release=self.open_plyer_selector)
+        dir_layout.add_widget(self.dir_input)
+        dir_layout.add_widget(browse_button)
         self.layout.add_widget(dir_layout)
 
         # Button panel
 
-        button_layout = GridLayout(cols=2)
-        button_layout.add_widget(Button(text="Calculate All Checksums"))
-        button_layout.add_widget(Button(text="Calculate MD5 Checksums"))
-        button_layout.add_widget(Button(text="Calculate SHA-1 Checksums"))
-        button_layout.add_widget(Button(text="Verify Checksums"))
-        button_layout.add_widget(Button(text="Verify Checksums In Subfolders"))
-        button_layout.add_widget(Button(text="Upgrade Legacy Checksums"))
-
-        self.layout.add_widget(button_layout)
+        self.button_layout = GridLayout(cols=2)
+        self.button_layout.add_widget(Button(text="Calculate All Checksums"))
+        self.button_layout.add_widget(Button(text="Calculate MD5 Checksums"))
+        self.button_layout.add_widget(Button(text="Calculate SHA-1 Checksums"))
+        self.button_layout.add_widget(Button(text="Verify Checksums"))
+        self.button_layout.add_widget(Button(text="Verify Checksums In Subfolders"))
+        self.button_layout.add_widget(Button(text="Upgrade Legacy Checksums"))
+        self.layout.add_widget(self.button_layout)
 
         return self.layout
+    
+    def open_plyer_selector(self, instance):
+        """
+        Opens the directory selection box using plyer.
+        :instance: The button instance that triggered the event.
+        """
+
+        filechooser.choose_dir(title="Select Directory", on_selection=self.process_plyer_selection)
+
+    def process_plyer_selection(self, dir_selection):
+        """
+        Processes the directory selection output
+        :dir_selection: The selected directory path.
+        """
+
+        if dir_selection:
+            dir_path = dir_selection[0]
+            # Update the TextInput with the selected directory path
+            self.dir_input.text = dir_path
+            # Enable buttons based on the selected directory
+            for button in self.button_layout.children:
+                button.disabled = False
+        else:
+            # Disable buttons if no directory is selected
+            for button in self.button_layout.children:
+                button.disabled = True
 
 if __name__ == "__main__":
     """
