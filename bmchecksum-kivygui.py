@@ -16,6 +16,8 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <https://www.gnu.org/licenses/>.
 """
 
+import os
+
 from kivy.app import App
 from kivy.uix.gridlayout import GridLayout
 from kivy.uix.button import Button
@@ -54,6 +56,7 @@ class BMChecksumGUI(App):
         
         dir_layout = GridLayout(cols=2)
         self.dir_input = TextInput(hint_text="Select directory", size_hint_x=9, height=20)
+        self.dir_input.bind(text=self.check_directory_validity)
         browse_button = Button(text="Browse", size_hint_x=1, height=20)
         browse_button.bind(on_release=self.open_plyer_selector)
         dir_layout.add_widget(self.dir_input)
@@ -69,9 +72,31 @@ class BMChecksumGUI(App):
         self.button_layout.add_widget(Button(text="Verify Checksums"))
         self.button_layout.add_widget(Button(text="Verify Checksums In Subfolders"))
         self.button_layout.add_widget(Button(text="Upgrade Legacy Checksums"))
+        
+        # Disable buttons initially
+        for button in self.button_layout.children:
+            button.disabled = True
+        
         self.layout.add_widget(self.button_layout)
 
         return self.layout
+    
+    def check_directory_validity(self, directory, *args):
+        """
+        Validates the selected directory and enables/disables buttons accordingly.
+        :directory: The directory path to validate.
+        :args: Additional unneeded arguments.
+        :return: True if valid, False otherwise.
+        """
+        # Check if the directory exists and is a directory
+        if os.path.isdir(directory.text):
+            # Enable buttons based on the selected directory
+            for button in self.button_layout.children:
+                button.disabled = False
+        else:
+            # Disable buttons if the directory is invalid
+            for button in self.button_layout.children:
+                button.disabled = True
     
     def open_plyer_selector(self, instance):
         """
