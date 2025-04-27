@@ -17,6 +17,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 """
 
 import os
+import core as bmc
 
 from kivy.app import App
 from kivy.uix.gridlayout import GridLayout
@@ -32,18 +33,19 @@ class BMChecksumGUI(App):
     def build(self):
         """
         Builds the main application interface using Kivy.
+        :return: The main layout of the application.
         """
-
+        
         self.window_size = (725, 480)
         self.title = "BMChecksum version 0.3.0"
         self.layout = GridLayout(cols=1, padding=10, spacing=10)
 
         # Output display section
 
-        output_display = TextInput(readonly=True, size_hint=(1, 4))
-        scroll_container = ScrollView(size_hint=(1, 4))
-        scroll_container.add_widget(output_display)
-        self.layout.add_widget(scroll_container)
+        self.output_display = TextInput(readonly=True, size_hint=(1, 4))
+        self.scroll_container = ScrollView(size_hint=(1, 4))
+        self.scroll_container.add_widget(self.output_display)
+        self.layout.add_widget(self.scroll_container)
 
         # Interface controls section with a documentation label, a row with directory entry and a buttons panel
 
@@ -66,12 +68,20 @@ class BMChecksumGUI(App):
         # Button panel
 
         self.button_layout = GridLayout(cols=2)
-        self.button_layout.add_widget(Button(text="Calculate All Checksums"))
-        self.button_layout.add_widget(Button(text="Calculate MD5 Checksums"))
-        self.button_layout.add_widget(Button(text="Calculate SHA-1 Checksums"))
-        self.button_layout.add_widget(Button(text="Verify Checksums"))
-        self.button_layout.add_widget(Button(text="Verify Checksums In Subfolders"))
-        self.button_layout.add_widget(Button(text="Upgrade Legacy Checksums"))
+
+        buttons = [
+            ("Calculate All Checksums", lambda: (self.clear_output_display(), bmc.start_checksum_process(self.dir_input.text, 0, self.update_output_display))),
+            ("Calculate MD5 Checksums", lambda: (self.clear_output_display(), bmc.start_checksum_process(self.dir_input.text, 1, self.update_output_display))),
+            ("Calculate SHA-1 Checksums", lambda: (self.clear_output_display(), bmc.start_checksum_process(self.dir_input.text, 2, self.update_output_display))),
+            ("Verify Checksums", lambda: (self.clear_output_display(), bmc.start_verification_process(self.dir_input.text, False, self.update_output_display))),
+            ("Verify Checksums In Subfolders", lambda: (self.clear_output_display(), bmc.verify_all_checksums_in_all_direct_subdirectories(self.dir_input.text, self.update_output_display))),
+            ("Upgrade Legacy Checksums", lambda: (self.clear_output_display(), bmc.start_upgrade_process(self.dir_input.text, self.update_output_display))),
+        ]
+
+        for text, action in buttons:
+            action_button = Button(text=text)
+            action_button.bind(on_release=action)
+            self.button_layout.add_widget(action_button)
         
         # Disable buttons initially
         for button in self.button_layout.children:
@@ -80,6 +90,20 @@ class BMChecksumGUI(App):
         self.layout.add_widget(self.button_layout)
 
         return self.layout
+    
+    def clear_output_display(self):
+        """
+        Clears the output display.
+        """
+        self.output_display.text = ""
+
+    def update_output_display(self, text):
+        """
+        Updates the output display with the given text.
+        :text: The text to display.
+        """
+        self.output_display.text += text + "\n"
+        self.scroll_container.scroll_y = 0
     
     def check_directory_validity(self, directory, *args):
         """
