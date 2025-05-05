@@ -70,12 +70,12 @@ class BMChecksumGUI(App):
         self.button_layout = GridLayout(cols=2)
 
         buttons = [
-            ("Calculate All Checksums", lambda: (self.clear_output_display(), bmc.start_checksum_process(self.dir_input.text, 0, self.update_output_display))),
-            ("Calculate MD5 Checksums", lambda: (self.clear_output_display(), bmc.start_checksum_process(self.dir_input.text, 1, self.update_output_display))),
-            ("Calculate SHA-1 Checksums", lambda: (self.clear_output_display(), bmc.start_checksum_process(self.dir_input.text, 2, self.update_output_display))),
-            ("Verify Checksums", lambda: (self.clear_output_display(), bmc.start_verification_process(self.dir_input.text, False, self.update_output_display))),
-            ("Verify Checksums In Subfolders", lambda: (self.clear_output_display(), bmc.verify_all_checksums_in_all_direct_subdirectories(self.dir_input.text, self.update_output_display))),
-            ("Upgrade Legacy Checksums", lambda: (self.clear_output_display(), bmc.start_upgrade_process(self.dir_input.text, self.update_output_display))),
+            ("Calculate All Checksums", lambda _: (self.clear_output_display(), bmc.start_checksum_process(self.dir_input.text, 0, self.update_output_display))),
+            ("Calculate MD5 Checksums", lambda _: (self.clear_output_display(), bmc.start_checksum_process(self.dir_input.text, 1, self.update_output_display))),
+            ("Calculate SHA-1 Checksums", lambda _: (self.clear_output_display(), bmc.start_checksum_process(self.dir_input.text, 2, self.update_output_display))),
+            ("Verify Checksums", lambda _: (self.clear_output_display(), bmc.start_verification_process(self.dir_input.text, False, self.update_output_display))),
+            ("Verify Checksums In Subfolders", lambda _: (self.clear_output_display(), bmc.verify_all_checksums_in_all_direct_subdirectories(self.dir_input.text, self.update_output_display))),
+            ("Upgrade Legacy Checksums", lambda _: (self.clear_output_display(), bmc.start_upgrade_process(self.dir_input.text, self.update_output_display))),
         ]
 
         for text, action in buttons:
@@ -103,7 +103,8 @@ class BMChecksumGUI(App):
         :text: The text to display.
         """
         self.output_display.text += text + "\n"
-        self.scroll_container.scroll_y = 0
+        # Scroll to the top of the output display
+        self.scroll_container.scroll_y = 1
     
     def check_directory_validity(self, directory, *args):
         """
