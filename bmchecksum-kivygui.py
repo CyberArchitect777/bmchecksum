@@ -51,15 +51,15 @@ class BMChecksumGUI(App):
 
         # Set label to wrap as needed based on window size.
 
-        doc_display = Label(text="Welcome to BMChecksum. Please select the required directory and then the calculate, verify or upgrade buttons to start.", size_hint_y=None, height=40)
+        doc_display = Label(text="Welcome to BMChecksum. Please select the required directory and then the calculate, verify or upgrade buttons to start.", size_hint_y=None, height=40, text_size=(725, None), halign="center", valign="center")
         self.layout.add_widget(doc_display)
         
         # Directory selection panel
         
-        dir_layout = GridLayout(cols=2)
-        self.dir_input = TextInput(hint_text="Select directory", size_hint_x=9, height=20)
+        dir_layout = GridLayout(cols=2, height=30, size_hint_y=None)
+        self.dir_input = TextInput(hint_text="Select directory", size_hint_x=9)
         self.dir_input.bind(text=self.check_directory_validity)
-        browse_button = Button(text="Browse", size_hint_x=1, height=20)
+        browse_button = Button(text="Browse", size_hint_x=1)
         browse_button.bind(on_release=self.open_plyer_selector)
         dir_layout.add_widget(self.dir_input)
         dir_layout.add_widget(browse_button)
@@ -140,6 +140,8 @@ class BMChecksumGUI(App):
             dir_path = dir_selection[0]
             # Update the TextInput with the selected directory path
             self.dir_input.text = dir_path
+            # Move back the cursor in the directory box to the start
+            self.dir_input.cursor = (0, 0)
             # Enable buttons based on the selected directory
             for button in self.button_layout.children:
                 button.disabled = False
