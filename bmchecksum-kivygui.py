@@ -17,6 +17,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 """
 
 import os
+import threading
 import core as bmc
 
 from kivy.app import App
@@ -25,6 +26,7 @@ from kivy.uix.button import Button
 from kivy.uix.textinput import TextInput
 from kivy.uix.label import Label
 from kivy.uix.scrollview import ScrollView
+from kivy.clock import Clock
 
 from plyer import filechooser
 
@@ -70,12 +72,12 @@ class BMChecksumGUI(App):
         self.button_layout = GridLayout(cols=2)
 
         buttons = [
-            ("Calculate All Checksums", lambda _: (self.clear_output_display(), bmc.start_checksum_process(self.dir_input.text, 0, self.update_output_display))),
-            ("Calculate MD5 Checksums", lambda _: (self.clear_output_display(), bmc.start_checksum_process(self.dir_input.text, 1, self.update_output_display))),
-            ("Calculate SHA-1 Checksums", lambda _: (self.clear_output_display(), bmc.start_checksum_process(self.dir_input.text, 2, self.update_output_display))),
-            ("Verify Checksums", lambda _: (self.clear_output_display(), bmc.start_verification_process(self.dir_input.text, False, self.update_output_display))),
-            ("Verify Checksums In Subfolders", lambda _: (self.clear_output_display(), bmc.verify_all_checksums_in_all_direct_subdirectories(self.dir_input.text, self.update_output_display))),
-            ("Upgrade Legacy Checksums", lambda _: (self.clear_output_display(), bmc.start_upgrade_process(self.dir_input.text, self.update_output_display))),
+            ("Calculate All Checksums", lambda _: (self.clear_output_display(), threading.Thread(target=lambda: bmc.start_checksum_process(self.dir_input.text, 0, self.update_output_display), daemon=True).start())),
+            ("Calculate MD5 Checksums", lambda _: (self.clear_output_display(), threading.Thread(target=lambda: bmc.start_checksum_process(self.dir_input.text, 1, self.update_output_display), daemon=True).start())),
+            ("Calculate SHA-1 Checksums", lambda _: (self.clear_output_display(), threading.Thread(target=lambda: bmc.start_checksum_process(self.dir_input.text, 2, self.update_output_display), daemon=True).start())),
+            ("Verify Checksums", lambda _: (self.clear_output_display(), threading.Thread(target=lambda: bmc.start_verification_process(self.dir_input.text, False, self.update_output_display), daemon=True).start())),
+            ("Verify Checksums In Subfolders", lambda _: (self.clear_output_display(), threading.Thread(target=lambda: bmc.verify_all_checksums_in_all_direct_subdirectories(self.dir_input.text, self.update_output_display), daemon=True).start())),
+            ("Upgrade Legacy Checksums", lambda _: (self.clear_output_display(), threading.Thread(target=lambda: bmc.start_upgrade_process(self.dir_input.text, self.update_output_display), daemon=True).start())),
         ]
 
         for text, action in buttons:
@@ -99,8 +101,16 @@ class BMChecksumGUI(App):
 
     def update_output_display(self, text):
         """
-        Updates the output display with the given text.
-        :text: The text to display.
+        Designed to allow the core functionality thread to update the Kivy interface
+        :text: The text to append to output_display.
+        """
+        # Call the function that actually provides the display update code
+        Clock.schedule_once(lambda dt: self.immediately_update_display(text))
+
+    def immediately_update_display(self, text):
+        """
+        Immediately updates the display.
+        :text: The text to append.
         """
         self.output_display.text += text + "\n"
         # Scroll to the top of the output display
