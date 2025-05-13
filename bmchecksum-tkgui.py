@@ -61,11 +61,21 @@ def validate_directory(directory_textbox, buttons):
     """
     directory = directory_textbox.get()
     if os.path.isdir(directory):  # Check if the path is a valid directory
-        for button in buttons:
-            button.config(state=tk.NORMAL)  # Enable buttons
+        disable_interface_buttons(buttons, False)  # Enable buttons
     else:
-        for button in buttons:
-            button.config(state=tk.DISABLED)  # Disable buttons
+        disable_interface_buttons(buttons, True)  # Disable buttons
+
+def disable_interface_buttons(buttons, state):
+    """
+    Sets whether the passed buttons are disabled or not
+    :param buttons: A list of button widgets to enable/disable
+    :param state: True for disabled
+    """
+    for button in buttons:
+        if state == True:
+            button.config(state=tk.DISABLED)  # Set button state
+        else:
+            button.config(state=tk.NORMAL)
 
 def main():
     """
@@ -139,8 +149,7 @@ def main():
     buttons[5].grid(row=2, column=1, padx=5, pady=5, sticky=tk.EW)
 
     # Disable buttons initially
-    for button in buttons:
-        button.config(state=tk.DISABLED)
+    disable_interface_buttons(buttons, True)
 
     directory_textbox_var = tk.StringVar()
     directory_textbox_var.trace_add("write", lambda *args: validate_directory(directory_textbox, buttons))
