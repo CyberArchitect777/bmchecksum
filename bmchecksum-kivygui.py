@@ -72,12 +72,12 @@ class BMChecksumGUI(App):
         self.button_layout = GridLayout(cols=2)
 
         buttons = [
-            ("Calculate All Checksums", lambda _: (self.clear_output_display(), threading.Thread(target=lambda: bmc.start_checksum_process(self.dir_input.text, 0, self.update_output_display), daemon=True).start())),
-            ("Calculate MD5 Checksums", lambda _: (self.clear_output_display(), threading.Thread(target=lambda: bmc.start_checksum_process(self.dir_input.text, 1, self.update_output_display), daemon=True).start())),
-            ("Calculate SHA-1 Checksums", lambda _: (self.clear_output_display(), threading.Thread(target=lambda: bmc.start_checksum_process(self.dir_input.text, 2, self.update_output_display), daemon=True).start())),
-            ("Verify Checksums", lambda _: (self.clear_output_display(), threading.Thread(target=lambda: bmc.start_verification_process(self.dir_input.text, False, self.update_output_display), daemon=True).start())),
-            ("Verify Checksums In Subfolders", lambda _: (self.clear_output_display(), threading.Thread(target=lambda: bmc.verify_all_checksums_in_all_direct_subdirectories(self.dir_input.text, self.update_output_display), daemon=True).start())),
-            ("Upgrade Legacy Checksums", lambda _: (self.clear_output_display(), threading.Thread(target=lambda: bmc.start_upgrade_process(self.dir_input.text, self.update_output_display), daemon=True).start())),
+            ("Calculate All Checksums", lambda _: threading.Thread(target=lambda: self.start_operation(0), daemon=True).start()),
+            ("Calculate MD5 Checksums", lambda _: threading.Thread(target=lambda: self.start_operation(1), daemon=True).start()),
+            ("Calculate SHA-1 Checksums", lambda _: threading.Thread(target=lambda: self.start_operation(2), daemon=True).start()),
+            ("Verify Checksums", lambda _: threading.Thread(target=lambda: self.start_operation(3), daemon=True).start()),
+            ("Verify Checksums In Subfolders", lambda _: threading.Thread(target=lambda: self.start_operation(4), daemon=True).start()),
+            ("Upgrade Legacy Checksums", lambda _: threading.Thread(target=lambda: self.start_operation(5), daemon=True).start()),
         ]
 
         for text, action in buttons:
@@ -95,9 +95,45 @@ class BMChecksumGUI(App):
     
     def clear_output_display(self):
         """
-        Clears the output display.
+        Designed to allow a thread other than the main one to clear the output display.
+        """
+        Clock.schedule_once(lambda dt: self.immediately_clear_output_display())
+
+    def immediately_clear_output_display(self):
+        """
+        Immediately clears the output display.
         """
         self.output_display.text = ""
+
+    def start_operation(self, button_index):
+        """
+        Starts the operation based on the button index.
+        :button_index: The index number of the button that was pressed.
+        """
+        # Clear the output display
+        self.clear_output_display()
+
+        # Disable all buttons to prevent multiple clicks
+        for button in self.button_layout.children:
+            button.disabled = True
+        
+        # Start the appropriate thread based on the button index
+        if button_index == 0:
+            bmc.start_checksum_process(self.dir_input.text, 0, self.update_output_display)
+        elif button_index == 1:
+            bmc.start_checksum_process(self.dir_input.text, 1, self.update_output_display)
+        elif button_index == 2:
+            bmc.start_checksum_process(self.dir_input.text, 2, self.update_output_display)
+        elif button_index == 3:
+            bmc.start_verification_process(self.dir_input.text, False, self.update_output_display)
+        elif button_index == 4:
+            bmc.verify_all_checksums_in_all_direct_subdirectories(self.dir_input.text, self.update_output_display)
+        elif button_index == 5:
+            bmc.start_upgrade_process(self.dir_input.text, self.update_output_display)
+
+        # Re-enable buttons after the operation is complete
+        for button in self.button_layout.children:
+            button.disabled = False
 
     def update_output_display(self, text):
         """
