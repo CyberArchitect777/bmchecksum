@@ -26,6 +26,7 @@ def start_upgrade_process(base_directory, message_destination=print):
     """
     Upgrade version 1.0 checksums to version 1.1 if the older checksums are detected.
     :param base_directory: The base directory to walk through
+    :param message_destination: The function to call to output the message
     """
 
     # Ensure that any unknown errors are displayed to the user as part of the program execution
@@ -89,6 +90,7 @@ def verify_all_checksums_in_all_direct_subdirectories(base_directory, message_de
     """
     Verifies all checksums found in all direct subdirectories in sequence
     :param base_directory: The base directory to walk through
+    :param message_destination: The function to call to output the message
     """
 
     try:
@@ -118,6 +120,7 @@ def start_verification_process(absolute_path, omit_statistics, message_destinati
     Start the verification process on the base directory.
     :param absolute_path: The absolute base path to walk through
     :param omit_statistics: Whether to omit the statistics at the end of the verification process
+    :param message_destination: The function to call to output the message
     """
 
     try:
@@ -251,6 +254,7 @@ def start_checksum_process(absolute_path, mode, message_destination=print):
     0 = Both MD5 and SHA-1
     1 = MD5 only
     2 = SHA-1 only
+    :param message_destination: The function to call to output the message
     """
 
     try:
@@ -352,7 +356,7 @@ def output_message(message, output_destination=print):
     """
     Output a message to the console or to an alternative passed destination.
     :param message: The message to output
-    :param callback: The function to call to output the message
+    :param message_destination: The function to call to output the message
     """
 
     output_destination(message)
