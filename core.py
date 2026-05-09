@@ -171,7 +171,6 @@ def start_verification_process(absolute_path, omit_statistics, message_destinati
                                 output_message("* File does not match MD5 checksum: " + os.path.relpath(file_path, absolute_path), message_destination)
                                 processed[3] += 1
                                 error_flag = True
-                            md5_file.close()
                 if sha1_present == 1:
                     # Check to see if the sha1 checksum file exists and report it if not.
                     if not os.path.exists(os.path.join(absolute_path, "bm11-sha1sums", relative_path + ".sha1")):
@@ -185,11 +184,10 @@ def start_verification_process(absolute_path, omit_statistics, message_destinati
                         with open(os.path.join(absolute_path, "bm11-sha1sums", relative_path + ".sha1"), "r") as sha1_file:
                             # Read sha1 checksum after stripping newline character for compatibility with Bash version of program
                             checksum_sha1 = (sha1_file.read()).rstrip()
-                        if file_sha1 != checksum_sha1:
-                            output_message("* File does not match SHA-1 checksum: " + os.path.relpath(file_path, absolute_path), message_destination)           
-                            processed[3] += 1
-                            error_flag = True
-                        sha1_file.close()
+                            if file_sha1 != checksum_sha1:
+                                output_message("* File does not match SHA-1 checksum: " + os.path.relpath(file_path, absolute_path), message_destination)           
+                                processed[3] += 1
+                                error_flag = True
             if md5_present == 1:
                 md5_file_paths = create_file_list(os.path.join(absolute_path, "bm11-md5sums"))
                 for md5_file_path in md5_file_paths:
