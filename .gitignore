@@ -2,4 +2,4 @@
 /bm11-sha1sums/
 /testing/
 /testing-backup/
-
+__pycache__/
