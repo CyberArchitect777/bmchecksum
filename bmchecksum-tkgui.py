@@ -119,7 +119,7 @@ def main():
     # Create the main application window
 
     main_window = tk.Tk()
-    main_window.title("BMChecksum version 0.2.0")
+    main_window.title("BMChecksum version 0.3.0")
     main_window.geometry("725x480")
 
     # Add PNG image as an application icon
