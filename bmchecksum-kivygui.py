@@ -21,14 +21,52 @@ import threading
 import core as bmc
 
 from kivy.app import App
+from kivy.core.window import Window
+from kivy.lang import Builder
+from kivy.uix.boxlayout import BoxLayout
+from kivy.uix.filechooser import FileChooserListView
 from kivy.uix.gridlayout import GridLayout
 from kivy.uix.button import Button
 from kivy.uix.textinput import TextInput
 from kivy.uix.label import Label
+from kivy.uix.popup import Popup
 from kivy.uix.scrollview import ScrollView
 from kivy.clock import Clock
 
-from plyer import filechooser
+Window.size = (950, 650)
+
+Builder.load_string('''
+[FileListEntry@FloatLayout+TreeViewNode]:
+    locked: False
+    entries: []
+    path: ctx.path
+    is_selected: self.path in ctx.controller().selection
+    orientation: 'horizontal'
+    size_hint_y: None
+    height: '48dp'
+    is_leaf: not ctx.isdir or ctx.name.endswith('..' + ctx.sep) or self.locked
+    on_touch_down: self.collide_point(*args[1].pos) and ctx.controller().entry_touched(self, args[1])
+    on_touch_up: self.collide_point(*args[1].pos) and ctx.controller().entry_released(self, args[1])
+    BoxLayout:
+        pos: root.pos
+        size_hint_x: None
+        width: root.width - dp(10)
+        Label:
+            id: filename
+            text_size: self.width, None
+            halign: 'left'
+            shorten: True
+            text: ctx.name
+            font_name: ctx.controller().font_name
+            font_size: '18sp'
+        Label:
+            text_size: self.width, None
+            size_hint_x: None
+            halign: 'right'
+            text: '{}'.format(ctx.get_nice_size())
+            font_name: ctx.controller().font_name
+            font_size: '18sp'
+''')
 
 class BMChecksumGUI(App):
 
@@ -38,13 +76,13 @@ class BMChecksumGUI(App):
         :return: The main layout of the application.
         """
         
-        self.window_size = (725, 480)
         self.title = "BMChecksum version 0.3.0"
+        self.icon = os.path.join(os.path.dirname(__file__), 'assets', 'images', 'icon_256x256.png')
         self.layout = GridLayout(cols=1, padding=10, spacing=10)
 
         # Output display section
 
-        self.output_display = TextInput(readonly=True, size_hint=(1, 4))
+        self.output_display = TextInput(readonly=True, size_hint=(1, 4), font_size='20sp')
         self.scroll_container = ScrollView(size_hint=(1, 4))
         self.scroll_container.add_widget(self.output_display)
         self.layout.add_widget(self.scroll_container)
@@ -53,16 +91,19 @@ class BMChecksumGUI(App):
 
         # Set label to wrap as needed based on window size.
 
-        doc_display = Label(text="Welcome to BMChecksum. Please select the required directory and then the calculate, verify or upgrade buttons to start.", size_hint_y=None, height=40, text_size=(725, None), halign="center", valign="center")
+        #doc_display = Label(text="Welcome to BMChecksum. Please select the required directory and then the calculate, verify or upgrade buttons to start.", size_hint_y=None, height=40, text_size=(725, None), halign="center", valign="center")
+        doc_display = Label(text="Welcome to BMChecksum. Please select the required directory and then the calculate, verify or upgrade buttons to start.", size_hint_y=None, height=40, halign="center", valign="top", font_size='20sp')
+        doc_display.bind(width=lambda inst, val: setattr(inst, 'text_size', (val, None)))
+        doc_display.bind(texture_size=lambda inst, val: setattr(inst, 'height', val[1]))
         self.layout.add_widget(doc_display)
         
         # Directory selection panel
         
-        dir_layout = GridLayout(cols=2, height=30, size_hint_y=None)
-        self.dir_input = TextInput(hint_text="Select directory", size_hint_x=9)
+        dir_layout = GridLayout(cols=2, height=40, size_hint_y=None)
+        self.dir_input = TextInput(hint_text="Select directory", size_hint_x=9, font_size='20sp')
         self.dir_input.bind(text=self.check_directory_validity)
-        browse_button = Button(text="Browse", size_hint_x=1)
-        browse_button.bind(on_release=self.open_plyer_selector)
+        browse_button = Button(text="Browse", size_hint_x=1, font_size='20sp')
+        browse_button.bind(on_release=self.open_dir_selector)
         dir_layout.add_widget(self.dir_input)
         dir_layout.add_widget(browse_button)
         self.layout.add_widget(dir_layout)
@@ -81,7 +122,7 @@ class BMChecksumGUI(App):
         ]
 
         for text, action in buttons:
-            action_button = Button(text=text)
+            action_button = Button(text=text, font_size='20sp')
             action_button.bind(on_release=action)
             self.button_layout.add_widget(action_button)
         
@@ -169,33 +210,40 @@ class BMChecksumGUI(App):
             for button in self.button_layout.children:
                 button.disabled = True
     
-    def open_plyer_selector(self, instance):
+    def open_dir_selector(self, _):
         """
-        Opens the directory selection box using plyer.
+        Opens a directory selection popup using Kivy's built-in file chooser.
+        """
+        content = BoxLayout(orientation='vertical', spacing=5)
+        self.filechooser = FileChooserListView(
+            dirselect=True,
+            filters=[lambda folder, filename: os.path.isdir(os.path.join(folder, filename))]
+        )
+        content.add_widget(self.filechooser)
+
+        button_row = BoxLayout(size_hint_y=None, height=50, spacing=5)
+        select_button = Button(text='Select', font_size='20sp')
+        cancel_button = Button(text='Cancel', font_size='20sp')
+        select_button.bind(on_release=self.process_dir_selection)
+        button_row.add_widget(select_button)
+        button_row.add_widget(cancel_button)
+        content.add_widget(button_row)
+
+        self.dir_popup = Popup(title='Select Directory', content=content, size_hint=(0.9, 0.9))
+        cancel_button.bind(on_release=self.dir_popup.dismiss)
+        self.dir_popup.open()
+
+    def process_dir_selection(self, instance):
+        """
+        Processes the directory selection from the Kivy file chooser popup.
         :instance: The button instance that triggered the event.
         """
-
-        filechooser.choose_dir(title="Select Directory", on_selection=self.process_plyer_selection)
-
-    def process_plyer_selection(self, dir_selection):
-        """
-        Processes the directory selection output
-        :dir_selection: The selected directory path.
-        """
-
-        if dir_selection:
-            dir_path = dir_selection[0]
-            # Update the TextInput with the selected directory path
-            self.dir_input.text = dir_path
-            # Move back the cursor in the directory box to the start
+        if self.filechooser.selection:
+            self.dir_input.text = self.filechooser.selection[0]
             self.dir_input.cursor = (0, 0)
-            # Enable buttons based on the selected directory
             for button in self.button_layout.children:
                 button.disabled = False
-        else:
-            # Disable buttons if no directory is selected
-            for button in self.button_layout.children:
-                button.disabled = True
+        self.dir_popup.dismiss()
 
 if __name__ == "__main__":
     """
