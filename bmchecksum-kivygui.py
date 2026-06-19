@@ -86,7 +86,7 @@ class BMChecksumGUI(App):
         # Output display section
 
         self.output_display = TextInput(
-            readonly=True, size_hint=(1, 4), font_size="20sp"
+            readonly=True, size_hint=(1, 4), font_size="14sp"
         )
         self.scroll_container = ScrollView(size_hint=(1, 4))
         self.scroll_container.add_widget(self.output_display)
@@ -103,7 +103,7 @@ class BMChecksumGUI(App):
             height=40,
             halign="center",
             valign="top",
-            font_size="20sp",
+            font_size="14sp",
         )
         doc_display.bind(
             width=lambda inst, val: setattr(inst, "text_size", (val, None))
@@ -113,12 +113,12 @@ class BMChecksumGUI(App):
 
         # Directory selection panel
 
-        dir_layout = GridLayout(cols=2, height=40, size_hint_y=None)
+        dir_layout = GridLayout(cols=2, height=50, size_hint_y=None)
         self.dir_input = TextInput(
-            hint_text="Select directory", size_hint_x=9, font_size="20sp"
+            hint_text="Select directory", size_hint_x=9, font_size="14sp"
         )
         self.dir_input.bind(text=self.check_directory_validity)
-        browse_button = Button(text="Browse", size_hint_x=1, font_size="20sp")
+        browse_button = Button(text="Browse", size_hint_x=1, font_size="14sp")
         browse_button.bind(on_release=self.open_dir_selector)
         dir_layout.add_widget(self.dir_input)
         dir_layout.add_widget(browse_button)
@@ -168,7 +168,7 @@ class BMChecksumGUI(App):
         ]
 
         for text, action in buttons:
-            action_button = Button(text=text, font_size="20sp")
+            action_button = Button(text=text, font_size="14sp")
             action_button.bind(on_release=action)
             self.button_layout.add_widget(action_button)
 
