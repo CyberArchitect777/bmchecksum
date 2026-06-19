@@ -79,19 +79,18 @@ def main():
             sys.exit(1)
     else:
         command = sys.argv[1]
-        base_directory = sys.argv[2]
+        base_directory = bmc.use_extended_length_path(sys.argv[2])
         if not os.path.exists(base_directory):
             print("Please provide a valid base directory path\n")
         else:
-            absolute_path = os.path.abspath(base_directory)
             if command == "-c":
-                bmc.start_checksum_process(absolute_path, 0)
+                bmc.start_checksum_process(base_directory, 0)
             elif command == "-cm":
-                bmc.start_checksum_process(absolute_path, 1)
+                bmc.start_checksum_process(base_directory, 1)
             elif command == "-cs":
-                bmc.start_checksum_process(absolute_path, 2)
+                bmc.start_checksum_process(base_directory, 2)
             elif command == "-v":
-                bmc.start_verification_process(absolute_path, False)
+                bmc.start_verification_process(base_directory, False)
             elif command == "-u":
                 bmc.start_upgrade_process(base_directory)
             elif command == "-s":
