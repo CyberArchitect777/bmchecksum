@@ -21,6 +21,25 @@ import os
 import traceback
 from datetime import datetime
 
+def use_extended_length_path(path):
+
+    """
+    Prefix a path with the Win32 extended-length syntax (\\\\?\\) so that file operations
+    are not limited to MAX_PATH (260 characters). Has no effect on non-Windows platforms.
+    :param path: The path to convert
+    :return: The extended-length path on Windows, or the original path elsewhere
+    """
+
+    if os.name != "nt":
+        return path
+    path = os.path.abspath(path)
+    if path.startswith("\\\\?\\"):
+        return path
+    if path.startswith("\\\\"):
+        # UNC path, e.g. \\server\share\... becomes \\?\UNC\server\share\...
+        return "\\\\?\\UNC\\" + path[2:]
+    return "\\\\?\\" + path
+
 def start_upgrade_process(base_directory, message_destination=print):
 
     """
@@ -31,6 +50,8 @@ def start_upgrade_process(base_directory, message_destination=print):
 
     # Ensure that any unknown errors are displayed to the user as part of the program execution
     try:
+        # Use an extended-length path so that long paths are handled correctly on Windows
+        base_directory = use_extended_length_path(base_directory)
 
         # Check for version 1.0 checksum directories, named bm-md5sums and bm-sha1sums in the base directory
 
@@ -94,6 +115,8 @@ def verify_all_checksums_in_all_direct_subdirectories(base_directory, message_de
     """
 
     try:
+        # Use an extended-length path so that long paths are handled correctly on Windows
+        base_directory = use_extended_length_path(base_directory)
 
         # Store current date and time for later use
         start_date = datetime.now()
@@ -124,6 +147,8 @@ def start_verification_process(absolute_path, omit_statistics, message_destinati
     """
 
     try:
+        # Use an extended-length path so that long paths are handled correctly on Windows
+        absolute_path = use_extended_length_path(absolute_path)
 
         md5_present = 0
         sha1_present = 0
@@ -256,6 +281,9 @@ def start_checksum_process(absolute_path, mode, message_destination=print):
     """
 
     try:
+        # Use an extended-length path so that long paths are handled correctly on Windows
+        absolute_path = use_extended_length_path(absolute_path)
+
         addition = False
         # Create the directories "bm11-md5sums" and "bm11-sha1sums" if they don't exist
         if not os.path.exists(os.path.join(absolute_path, "bm11-md5sums")) and (mode == 0 or mode == 1):
@@ -286,11 +314,14 @@ def start_checksum_process(absolute_path, mode, message_destination=print):
             # Calculate the relative paths of the files and directories
             relative_path = os.path.relpath(file_path, absolute_path)
             relative_dir_path = os.path.relpath(os.path.dirname(file_path), absolute_path)
+            # Avoid joining a "." segment, which extended-length paths cannot normalize away
+            md5_dir_path = os.path.join(absolute_path, "bm11-md5sums", relative_dir_path) if relative_dir_path != "." else os.path.join(absolute_path, "bm11-md5sums")
+            sha1_dir_path = os.path.join(absolute_path, "bm11-sha1sums", relative_dir_path) if relative_dir_path != "." else os.path.join(absolute_path, "bm11-sha1sums")
             # Create a new directory for the new checksums if it doesn't exist
-            if not os.path.exists(os.path.join(absolute_path, "bm11-md5sums", relative_dir_path)) and (mode == 0 or mode == 1):
-                os.makedirs(os.path.join(absolute_path, "bm11-md5sums", relative_dir_path))
-            if not os.path.exists(os.path.join(absolute_path, "bm11-sha1sums", relative_dir_path)) and (mode == 0 or mode == 2):
-                os.makedirs(os.path.join(absolute_path, "bm11-sha1sums", relative_dir_path))
+            if not os.path.exists(md5_dir_path) and (mode == 0 or mode == 1):
+                os.makedirs(md5_dir_path)
+            if not os.path.exists(sha1_dir_path) and (mode == 0 or mode == 2):
+                os.makedirs(sha1_dir_path)
             # Write the output of the checksum functions to a mirrored directory structure to the 
             # original files underneath the bm11-md5sums and bm11-sha1sums directories 
             if not os.path.exists(os.path.join(absolute_path, "bm11-md5sums", relative_path + ".md5")) and (mode == 0 or mode == 1):
