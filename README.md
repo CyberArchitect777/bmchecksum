@@ -26,7 +26,7 @@ To run version 0.3.0, the standard Python 3 interpreter must be installed and av
 
 `python3 bmchecksum-tkgui.py`- To run the Tkinter GUI version.
 
-`python3 bmchecksum-kivygui.py` - To run the Kivy GUI version. An additional kivy library must be installed to use this via `pip install kivy`.
+`python3 bmchecksum-kivygui.py` - To run the Kivy GUI version. An additional set of requirements must be installed to use this via `pip install -r requirements-kivygui.txt`.
 
 ### Latest source code
 
@@ -95,6 +95,7 @@ In version 1.0, BMChecksum stored checksum files in the base directory being che
 
 - Github Copilot and later Claude Code for rapid development.
 - ChatGPT for technical assistance and image generation.
+- Black for code formatting.
 
 ## License
 
