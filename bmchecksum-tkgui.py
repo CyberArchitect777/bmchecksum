@@ -21,23 +21,26 @@ import tkinter as tk
 from tkinter import filedialog, scrolledtext
 import os
 
+
 def browse_directory(directory_textbox):
     """
     Opens a file dialog to select a directory and updates the directory_textbox with the selected path.
     :param directory_textbox: The Entry widget to update with the selected directory path
     """
-    
+
     checksum_directory = filedialog.askdirectory(title="Select Directory")
     if checksum_directory:
-        if os.name == 'nt':  # Check if the operating system is Windows
-            checksum_directory = checksum_directory.replace("/", "\\")  # Ensure Windows standard paths
+        if os.name == "nt":  # Check if the operating system is Windows
+            checksum_directory = checksum_directory.replace(
+                "/", "\\"
+            )  # Ensure Windows standard paths
         directory_textbox.delete(0, tk.END)
         directory_textbox.insert(0, checksum_directory)
 
 
 def enclosed_output_display(output_display):
     """
-    This function passes in the output_display variable to ensure any 
+    This function passes in the output_display variable to ensure any
     internal functions can access it. It has been done to avoid global
     variable use
     :param output_display: The scrolled text widget to display output
@@ -53,6 +56,7 @@ def enclosed_output_display(output_display):
 
     return update_output_display
 
+
 def validate_directory(directory_textbox, buttons):
     """
     Validates the directory path in the directory_textbox and enables/disables buttons accordingly.
@@ -64,6 +68,7 @@ def validate_directory(directory_textbox, buttons):
         disable_interface_buttons(buttons, False)  # Enable buttons
     else:
         disable_interface_buttons(buttons, True)  # Disable buttons
+
 
 def disable_interface_buttons(buttons, state):
     """
@@ -77,6 +82,7 @@ def disable_interface_buttons(buttons, state):
         else:
             button.config(state=tk.NORMAL)
 
+
 def handle_button_click(button_index, buttons, directory_textbox, output_display):
     """
     Handles the button click event and performs the corresponding action.
@@ -85,31 +91,44 @@ def handle_button_click(button_index, buttons, directory_textbox, output_display
     :param directory_textbox: A string containing the directory path
     :param output_display: The passed text widget to display output
     """
-    
+
     # Clear the output display and disable buttons
-    output_display.delete(1.0, tk.END), 
+    output_display.delete(1.0, tk.END),
     disable_interface_buttons(buttons, True)
 
     if button_index == 0:
         # Calculate all checksums
-        bmc.start_checksum_process(directory_textbox, 0, enclosed_output_display(output_display))
+        bmc.start_checksum_process(
+            directory_textbox, 0, enclosed_output_display(output_display)
+        )
     elif button_index == 1:
         # Calculate MD5 checksums
-        bmc.start_checksum_process(directory_textbox, 1, enclosed_output_display(output_display))
+        bmc.start_checksum_process(
+            directory_textbox, 1, enclosed_output_display(output_display)
+        )
     elif button_index == 2:
         # Calculate SHA-1 checksums
-        bmc.start_checksum_process(directory_textbox, 2, enclosed_output_display(output_display))
+        bmc.start_checksum_process(
+            directory_textbox, 2, enclosed_output_display(output_display)
+        )
     elif button_index == 3:
         # Verify checksums
-        bmc.start_verification_process(directory_textbox, False, enclosed_output_display(output_display))
+        bmc.start_verification_process(
+            directory_textbox, False, enclosed_output_display(output_display)
+        )
     elif button_index == 4:
         # Verify checksums in all direct subfolders
-        bmc.verify_all_checksums_in_all_direct_subdirectories(directory_textbox, enclosed_output_display(output_display))
+        bmc.verify_all_checksums_in_all_direct_subdirectories(
+            directory_textbox, enclosed_output_display(output_display)
+        )
     elif button_index == 5:
         # Upgrade legacy checksums
-        bmc.start_upgrade_process(directory_textbox, enclosed_output_display(output_display))
+        bmc.start_upgrade_process(
+            directory_textbox, enclosed_output_display(output_display)
+        )
 
     disable_interface_buttons(buttons, False)
+
 
 def main():
     """
@@ -123,9 +142,12 @@ def main():
     main_window.geometry("725x480")
 
     # Add PNG image as an application icon
-    
+
     try:
-        icon_path = os.path.join(os.path.dirname(__file__), "assets" + os.sep + "images" + os.sep + "mainicon.png")
+        icon_path = os.path.join(
+            os.path.dirname(__file__),
+            "assets" + os.sep + "images" + os.sep + "mainicon.png",
+        )
         main_window.iconphoto(False, tk.PhotoImage(file=icon_path))
     except Exception as e:
         print(f"Error loading icon: {e}")
@@ -137,16 +159,23 @@ def main():
     main_window.grid_columnconfigure(0, weight=1)
 
     # Output display section
-    
+
     output_display = scrolledtext.ScrolledText(main_window, wrap=tk.WORD)
     output_display.grid(row=0, column=0, rowspan=4, padx=5, pady=5, sticky=tk.NSEW)
-    
+
     # Interface controls section with a documentation label, a row with directory entry and a buttons panel
 
     # Set label to wrap as needed based on window size.
-    doc_display = tk.Label(main_window, text="Welcome to BMChecksum. Please select the required directory and then the calculate, verify or upgrade buttons to start.", wraplength=main_window.winfo_width() - 20, justify="center")
-    main_window.bind("<Configure>", lambda event: doc_display.config(wraplength=event.width - 20))
-    doc_display.grid(row=4, column=0, padx=5, pady=5, sticky=tk.EW)    
+    doc_display = tk.Label(
+        main_window,
+        text="Welcome to BMChecksum. Please select the required directory and then the calculate, verify or upgrade buttons to start.",
+        wraplength=main_window.winfo_width() - 20,
+        justify="center",
+    )
+    main_window.bind(
+        "<Configure>", lambda event: doc_display.config(wraplength=event.width - 20)
+    )
+    doc_display.grid(row=4, column=0, padx=5, pady=5, sticky=tk.EW)
 
     # Directory selection panel
 
@@ -154,7 +183,11 @@ def main():
     directory_frame.grid(row=5, column=0, padx=5, pady=5, sticky=tk.EW)
     tk.Label(directory_frame, text="Directory:").pack(side=tk.LEFT, padx=5, pady=5)
     directory_textbox = tk.Entry(directory_frame)
-    tk.Button(directory_frame, text="Browse", command=lambda: browse_directory(directory_textbox)).pack(side=tk.RIGHT, padx=5, pady=5)
+    tk.Button(
+        directory_frame,
+        text="Browse",
+        command=lambda: browse_directory(directory_textbox),
+    ).pack(side=tk.RIGHT, padx=5, pady=5)
     directory_textbox.pack(padx=5, pady=5, fill=tk.X, expand=True)
 
     # Button panel
@@ -167,33 +200,44 @@ def main():
             button_frame.grid_columnconfigure(cell, weight=1)
     # Button list for later access. Width set to 35 pixels minimum
     buttons = [
-    tk.Button(button_frame, width=35, text="Calculate All Checksums"),
-    tk.Button(button_frame, width=35, text="Calculate MD5 Checksums"),
-    tk.Button(button_frame, width=35, text="Calculate SHA-1 Checksums"),
-    tk.Button(button_frame, width=35, text="Verify Checksums"),
-    tk.Button(button_frame, width=35, text="Verify Checksums In All Direct Subfolders"),
-    tk.Button(button_frame, width=35, text="Upgrade Legacy Checksums"),
+        tk.Button(button_frame, width=35, text="Calculate All Checksums"),
+        tk.Button(button_frame, width=35, text="Calculate MD5 Checksums"),
+        tk.Button(button_frame, width=35, text="Calculate SHA-1 Checksums"),
+        tk.Button(button_frame, width=35, text="Verify Checksums"),
+        tk.Button(
+            button_frame, width=35, text="Verify Checksums In All Direct Subfolders"
+        ),
+        tk.Button(button_frame, width=35, text="Upgrade Legacy Checksums"),
     ]
 
     for index, button in enumerate(buttons):
-        buttons[index].grid(row=index // 2, column=index % 2, padx=5, pady=5, sticky=tk.EW)
-        buttons[index].config(command=lambda idx=index: handle_button_click(idx, buttons, directory_textbox.get(), output_display))
+        buttons[index].grid(
+            row=index // 2, column=index % 2, padx=5, pady=5, sticky=tk.EW
+        )
+        buttons[index].config(
+            command=lambda idx=index: handle_button_click(
+                idx, buttons, directory_textbox.get(), output_display
+            )
+        )
 
     # Disable buttons initially
     disable_interface_buttons(buttons, True)
 
     directory_textbox_var = tk.StringVar()
-    directory_textbox_var.trace_add("write", lambda *args: validate_directory(directory_textbox, buttons))
+    directory_textbox_var.trace_add(
+        "write", lambda *args: validate_directory(directory_textbox, buttons)
+    )
     directory_textbox.config(textvariable=directory_textbox_var)
 
     # Start the Tkinter event loop
-    
+
     main_window.mainloop()
 
+
 if __name__ == "__main__":
-    
+
     """
     Runs the main function if this code is being run directly.
     """
-    
+
     main()

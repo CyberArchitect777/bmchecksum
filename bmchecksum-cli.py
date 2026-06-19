@@ -20,29 +20,39 @@ import core as bmc
 import sys
 import os
 
+
 def help():
-    
     """
     Outputs help information to the user if asked for or if an invalid function is specified
     """
-    
+
     print("General usage:")
     print("\nbmchecksum <command> <base directory>")
     print("\nCommands:")
     print("\n-c = Create all checksums for all subdirectories in the base directory")
-    print("-cm = Create only MD5 checksums for all subdirectories in the base directory")
-    print("-cs = Create only SHA-1 checksums for all subdirectories in the base directory")
-    print("-v = Verify file checksums in all subdirectories based on those found in the base directory")
-    print("-s = Verify file checksums in all direct subdirectories found in the base directory")
-    print("-u = Upgrade checksums from checksum version 1.0 to the latest version (1.1)")
+    print(
+        "-cm = Create only MD5 checksums for all subdirectories in the base directory"
+    )
+    print(
+        "-cs = Create only SHA-1 checksums for all subdirectories in the base directory"
+    )
+    print(
+        "-v = Verify file checksums in all subdirectories based on those found in the base directory"
+    )
+    print(
+        "-s = Verify file checksums in all direct subdirectories found in the base directory"
+    )
+    print(
+        "-u = Upgrade checksums from checksum version 1.0 to the latest version (1.1)"
+    )
     print("-h = Help\n")
 
+
 def main():
-    
     """
     The first function run upon program start to provide the command-line interface
     """
-    
+
     print("\nBMChecksum")
     print("Version 0.3.0")
     print("\nPython Edition")
@@ -61,7 +71,9 @@ def main():
         elif command == "-u":
             print("Please provide a base directory name to upgrade checksums on\n")
         elif command == "-s":
-            print("Please provide a base directory name to verify checksums in all direct subdirectories in\n")
+            print(
+                "Please provide a base directory name to verify checksums in all direct subdirectories in\n"
+            )
         else:
             help()
             sys.exit(1)
@@ -88,10 +100,11 @@ def main():
                 help()
                 sys.exit(1)
 
+
 if __name__ == "__main__":
-    
+
     """
     Runs the main function if this code is being run directly.
     """
-    
+
     main()
