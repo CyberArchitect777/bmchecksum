@@ -43,6 +43,9 @@ def help():
         "-s = Verify file checksums in all direct subdirectories found in the base directory"
     )
     print(
+        "-r = Seek out and verify file checksums in every directory holding checksum data, starting at the base directory"
+    )
+    print(
         "-u = Upgrade checksums from checksum version 1.0 to the latest version (1.1)"
     )
     print("-h = Help\n")
@@ -54,7 +57,7 @@ def main():
     """
 
     print("\nBMChecksum")
-    print("Version 0.3.1")
+    print("Version 0.3.2")
     print("\nPython Edition")
     print("By Barrie Millar")
     print("A file hashing program to store and later verify the checksums of files\n")
@@ -73,6 +76,10 @@ def main():
         elif command == "-s":
             print(
                 "Please provide a base directory name to verify checksums in all direct subdirectories in\n"
+            )
+        elif command == "-r":
+            print(
+                "Please provide a base directory name to seek out and verify all checksums in\n"
             )
         else:
             help()
@@ -95,6 +102,8 @@ def main():
                 bmc.start_upgrade_process(base_directory)
             elif command == "-s":
                 bmc.verify_all_checksums_in_all_direct_subdirectories(base_directory)
+            elif command == "-r":
+                bmc.verify_all_checksums_in_all_subdirectories(base_directory)
             else:
                 help()
                 sys.exit(1)

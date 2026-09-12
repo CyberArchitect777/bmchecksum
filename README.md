@@ -2,7 +2,7 @@
 ## By Barrie Millar
 ### A file hashing program to store and later verify the checksums of files
 
-### Version 0.3.1
+### Version 0.3.2
 
 ## Introduction
 
@@ -20,7 +20,7 @@ No packaged releases of the application have been created yet. However, the late
 
 https://github.com/CyberArchitect777/bmchecksum/tags
 
-To run version 0.3.1, the standard Python 3 interpreter must be installed and available. The BMChecksum compressed archive should then be extracted to a new directory. The follwing files should be run based on the application that the user wishes to run.
+To run version 0.3.2, the standard Python 3 interpreter must be installed and available. The BMChecksum compressed archive should then be extracted to a new directory. The follwing files should be run based on the application that the user wishes to run.
 
 `python3 bmchecksum-cli.py` - To run the command-line version of the program (best done from a command-line interpreter). As the command-line version works via parameters, the instructions printed by this command will help the user proceed further.
 
@@ -55,9 +55,9 @@ To acquire and run the latest source code, the following can be done.
 
 The GitHub repository is [here](https://github.com/CyberArchitect777/bmchecksum)
 
-The main development branch is located in the root directory. All versions of this software are tagged and can also be acquired with Git. An example of how to do this with the v0.3.1 codebase is:-
+The main development branch is located in the root directory. All versions of this software are tagged and can also be acquired with Git. An example of how to do this with the v0.3.2 codebase is:-
 
-`git checkout v0.3.1`
+`git checkout v0.3.2`
 
 ## Technical
 
@@ -68,6 +68,10 @@ This program was created using the following technologies:
 - Python 3
 
 ### BM-Checksum Versions
+
+0.3.2 - 12th of September, 2026
+
+* Added an option to all three editions to seek out and verify the checksums in every directory holding checksum data, starting at the chosen directory.
 
 0.3.1 - 12th of September, 2026
 

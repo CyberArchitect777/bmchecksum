@@ -137,6 +137,87 @@ def verify_all_checksums_in_all_direct_subdirectories(base_directory, message_de
     except Exception as error:
         documentUnknownError(error, message_destination)
 
+def verify_all_checksums_in_all_subdirectories(base_directory, message_destination=print):
+
+    """
+    Seeks out every directory holding checksum data underneath and including the base directory
+    and verifies each one in turn. Directories holding legacy (checksum version 1.0) data are
+    announced as needing an upgrade and are not verified.
+    :param base_directory: The base directory to walk through
+    :param message_destination: The function to call to output the message
+    """
+
+    try:
+        # Use an extended-length path so that long paths are handled correctly on Windows
+        base_directory = use_extended_length_path(base_directory)
+
+        # Store current date and time for later use
+        start_date = datetime.now()
+        output_message("Seeking out all directories holding checksum data...\n", message_destination)
+        checksum_directories = find_checksum_directories(base_directory)
+        if len(checksum_directories) == 0:
+            output_message("No verification data could be found in any directory. Aborting...\n", message_destination)
+        else:
+            directories_verified = 0
+            legacy_directories = []
+            for directory, current_data_found, legacy_data_found in checksum_directories:
+                display_path = return_display_path(directory, base_directory)
+                # Legacy checksums cannot be verified as they are held in a format this version no longer reads
+                if legacy_data_found == True:
+                    legacy_directories.append(display_path)
+                    output_message("* Legacy checksum data found in directory: " + display_path, message_destination)
+                    output_message("  These checksums need upgrading to the current standard and have not been verified.\n", message_destination)
+                if current_data_found == True:
+                    output_message("Verifying files in directory: " + display_path + "\n", message_destination)
+                    start_verification_process(directory, True, message_destination)
+                    directories_verified += 1
+            # Remind the user of every directory still holding legacy data so that none are overlooked
+            if len(legacy_directories) > 0:
+                output_message("Legacy checksum data was found in " + str(len(legacy_directories)) + " directory(s):", message_destination)
+                for legacy_directory in legacy_directories:
+                    output_message("* " + legacy_directory, message_destination)
+                output_message("\nPlease use the upgrade option on each of these directories to bring them up to the current standard (checksum version 1.1).\n", message_destination)
+            end_date = datetime.now()
+            time_elapsed = end_date - start_date
+            output_message("Verification of all directories holding checksum data complete. " + str(directories_verified) + " directory(s) verified. Operation took " + return_human_readable_time_elapsed(time_elapsed) + "\n", message_destination)
+    except Exception as error:
+        documentUnknownError(error, message_destination)
+
+def find_checksum_directories(base_directory):
+
+    """
+    Walk the base directory, including the base directory itself, and find every directory
+    holding at least one checksum folder of either the current or the legacy standard.
+    :param base_directory: The base directory to walk through
+    :return: A list of tuples holding the directory path, whether current checksum data was
+    found and whether legacy checksum data was found
+    """
+
+    checksum_directories = []
+    for root, dirs, files in os.walk(base_directory):
+        # Do not descend into checksum folders as they hold checksum data rather than original files.
+        # Sorting is also done here to ensure that directories are reported in a predictable order.
+        dirs[:] = sorted(directory for directory in dirs if directory not in ("bm11-md5sums", "bm11-sha1sums", "bm-md5sums", "bm-sha1sums"))
+        current_data_found = os.path.exists(os.path.join(root, "bm11-md5sums")) or os.path.exists(os.path.join(root, "bm11-sha1sums"))
+        legacy_data_found = os.path.exists(os.path.join(root, "bm-md5sums")) or os.path.exists(os.path.join(root, "bm-sha1sums"))
+        if current_data_found == True or legacy_data_found == True:
+            checksum_directories.append((root, current_data_found, legacy_data_found))
+    return checksum_directories
+
+def return_display_path(directory, base_directory):
+
+    """
+    Return a path suitable for display to the user, shown relative to the base directory.
+    :param directory: The directory to display
+    :param base_directory: The base directory the display path is relative to
+    :return: The relative path, or a description of the base directory if they are the same
+    """
+
+    display_path = os.path.relpath(directory, base_directory)
+    if display_path == ".":
+        return "<base directory>"
+    return display_path
+
 def start_verification_process(absolute_path, omit_statistics, message_destination=print):
 
     """

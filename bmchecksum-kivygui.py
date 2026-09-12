@@ -77,7 +77,7 @@ class BMChecksumGUI(App):
         :return: The main layout of the application.
         """
 
-        self.title = "BMChecksum version 0.3.1"
+        self.title = "BMChecksum version 0.3.2"
         self.icon = os.path.join(
             os.path.dirname(__file__), "assets", "images", "icon_256x256.png"
         )
@@ -126,7 +126,7 @@ class BMChecksumGUI(App):
 
         # Button panel
 
-        self.button_layout = GridLayout(cols=2)
+        self.button_layout = GridLayout(cols=1)
 
         buttons = [
             (
@@ -165,15 +165,35 @@ class BMChecksumGUI(App):
                     target=lambda: self.start_operation(5), daemon=True
                 ).start(),
             ),
+            (
+                "Seek And Verify All Checksums",
+                lambda _: threading.Thread(
+                    target=lambda: self.start_operation(6), daemon=True
+                ).start(),
+            ),
         ]
 
-        for text, action in buttons:
+        # The first button sits on a row of its own stretched across the full width, with every
+        # other button following underneath in the standard two column arrangement. The size
+        # hints keep every button row the same height as the two column rows below.
+        self.action_buttons = []
+
+        first_button_text, first_button_action = buttons[0]
+        first_button = Button(text=first_button_text, font_size="14sp", size_hint_y=1)
+        first_button.bind(on_release=first_button_action)
+        self.action_buttons.append(first_button)
+        self.button_layout.add_widget(first_button)
+
+        remaining_button_layout = GridLayout(cols=2, size_hint_y=3)
+        for text, action in buttons[1:]:
             action_button = Button(text=text, font_size="14sp")
             action_button.bind(on_release=action)
-            self.button_layout.add_widget(action_button)
+            self.action_buttons.append(action_button)
+            remaining_button_layout.add_widget(action_button)
+        self.button_layout.add_widget(remaining_button_layout)
 
         # Disable buttons initially
-        for button in self.button_layout.children:
+        for button in self.action_buttons:
             button.disabled = True
 
         self.layout.add_widget(self.button_layout)
@@ -201,7 +221,7 @@ class BMChecksumGUI(App):
         self.clear_output_display()
 
         # Disable all buttons to prevent multiple clicks
-        for button in self.button_layout.children:
+        for button in self.action_buttons:
             button.disabled = True
 
         # Start the appropriate thread based on the button index
@@ -227,9 +247,13 @@ class BMChecksumGUI(App):
             )
         elif button_index == 5:
             bmc.start_upgrade_process(self.dir_input.text, self.update_output_display)
+        elif button_index == 6:
+            bmc.verify_all_checksums_in_all_subdirectories(
+                self.dir_input.text, self.update_output_display
+            )
 
         # Re-enable buttons after the operation is complete
-        for button in self.button_layout.children:
+        for button in self.action_buttons:
             button.disabled = False
 
     def update_output_display(self, text):
@@ -259,11 +283,11 @@ class BMChecksumGUI(App):
         # Check if the directory exists and is a directory
         if os.path.isdir(directory.text):
             # Enable buttons based on the selected directory
-            for button in self.button_layout.children:
+            for button in self.action_buttons:
                 button.disabled = False
         else:
             # Disable buttons if the directory is invalid
-            for button in self.button_layout.children:
+            for button in self.action_buttons:
                 button.disabled = True
 
     def open_dir_selector(self, _):
@@ -301,7 +325,7 @@ class BMChecksumGUI(App):
         if self.filechooser.selection:
             self.dir_input.text = self.filechooser.selection[0]
             self.dir_input.cursor = (0, 0)
-            for button in self.button_layout.children:
+            for button in self.action_buttons:
                 button.disabled = False
         self.dir_popup.dismiss()
 

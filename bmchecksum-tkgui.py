@@ -126,6 +126,11 @@ def handle_button_click(button_index, buttons, directory_textbox, output_display
         bmc.start_upgrade_process(
             directory_textbox, enclosed_output_display(output_display)
         )
+    elif button_index == 6:
+        # Seek out and verify checksums in every directory holding checksum data
+        bmc.verify_all_checksums_in_all_subdirectories(
+            directory_textbox, enclosed_output_display(output_display)
+        )
 
     disable_interface_buttons(buttons, False)
 
@@ -138,8 +143,8 @@ def main():
     # Create the main application window
 
     main_window = tk.Tk()
-    main_window.title("BMChecksum version 0.3.1")
-    main_window.geometry("725x480")
+    main_window.title("BMChecksum version 0.3.2")
+    main_window.geometry("725x530")
 
     # Add PNG image as an application icon
 
@@ -193,8 +198,8 @@ def main():
     # Button panel
 
     button_frame = tk.Frame(main_window)
-    button_frame.grid(row=6, column=0, rowspan=3, padx=5, pady=5, sticky=tk.NSEW)
-    for cell in range(3):
+    button_frame.grid(row=6, column=0, rowspan=4, padx=5, pady=5, sticky=tk.NSEW)
+    for cell in range(4):
         button_frame.grid_rowconfigure(cell, weight=1)
         if cell < 2:
             button_frame.grid_columnconfigure(cell, weight=1)
@@ -208,12 +213,24 @@ def main():
             button_frame, width=35, text="Verify Checksums In All Direct Subfolders"
         ),
         tk.Button(button_frame, width=35, text="Upgrade Legacy Checksums"),
+        tk.Button(button_frame, width=35, text="Seek And Verify All Checksums"),
     ]
 
     for index, button in enumerate(buttons):
-        buttons[index].grid(
-            row=index // 2, column=index % 2, padx=5, pady=5, sticky=tk.EW
-        )
+        # The first button sits on a row of its own stretched across both columns, with every
+        # other button following underneath in the standard two column arrangement
+        if index == 0:
+            buttons[index].grid(
+                row=0, column=0, columnspan=2, padx=5, pady=5, sticky=tk.EW
+            )
+        else:
+            buttons[index].grid(
+                row=(index - 1) // 2 + 1,
+                column=(index - 1) % 2,
+                padx=5,
+                pady=5,
+                sticky=tk.EW,
+            )
         buttons[index].config(
             command=lambda idx=index: handle_button_click(
                 idx, buttons, directory_textbox.get(), output_display
