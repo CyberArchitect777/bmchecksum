@@ -2,11 +2,11 @@
 ## By Barrie Millar
 ### A file hashing program to store and later verify the checksums of files
 
-### Version 0.3.0
+### Version 0.3.1
 
 ## Introduction
 
-BMChecksum is a program to hash files recursively using standard algorithms and then store those codes in relative directories. At a later date, the original files can then be verified against the calculated checksums to confirm the byte integrity of the processed files. The language chosen to produce the modern version of this project is Python and will be cross-platform with Windows and Linux at a minimum.
+BMChecksum is a program to hash files recursively using standard algorithms and then store those codes in relative directories. At a later date, the original files can then be verified against the calculated checksums to confirm the byte integrity of the processed files. The language chosen to produce the modern version of this project is Python and is cross-platform with Windows and Linux at a minimum.
 
 This new edition is based on a legacy software product I created long ago but never released. The original application was written as a Java GUI program and has been used for a number of years. A separate Bash script was also created to achieve the same purpose from the command-line. The codebases of both are currently outdated though and it is the purpose of this repository to create a modern version of this concept. Any versions produced here will be compatible with past checksum creations or offer a way to upgrade older hash codes to the newest standards. The latter will be achieved without requiring any checksum recalculations. 
 
@@ -20,7 +20,7 @@ No packaged releases of the application have been created yet. However, the late
 
 https://github.com/CyberArchitect777/bmchecksum/tags
 
-To run version 0.3.0, the standard Python 3 interpreter must be installed and available. The BMChecksum compressed archive should then be extracted to a new directory. The follwing files should be run based on the application that the user wishes to run.
+To run version 0.3.1, the standard Python 3 interpreter must be installed and available. The BMChecksum compressed archive should then be extracted to a new directory. The follwing files should be run based on the application that the user wishes to run.
 
 `python3 bmchecksum-cli.py` - To run the command-line version of the program (best done from a command-line interpreter). As the command-line version works via parameters, the instructions printed by this command will help the user proceed further.
 
@@ -55,9 +55,9 @@ To acquire and run the latest source code, the following can be done.
 
 The GitHub repository is [here](https://github.com/CyberArchitect777/bmchecksum)
 
-The main development branch is located in the root directory. All versions of this software are tagged and can also be acquired with Git. An example of how to do this with the v0.3.0 codebase is:-
+The main development branch is located in the root directory. All versions of this software are tagged and can also be acquired with Git. An example of how to do this with the v0.3.1 codebase is:-
 
-`git checkout v0.3.0`
+`git checkout v0.3.1`
 
 ## Technical
 
@@ -68,6 +68,10 @@ This program was created using the following technologies:
 - Python 3
 
 ### BM-Checksum Versions
+
+0.3.1 - 12th of September, 2026
+
+* Resolved issues when handling long local and network path names in Windows.
 
 0.3.0 - 10th of May, 2026
 

@@ -54,7 +54,7 @@ def main():
     """
 
     print("\nBMChecksum")
-    print("Version 0.3.0")
+    print("Version 0.3.1")
     print("\nPython Edition")
     print("By Barrie Millar")
     print("A file hashing program to store and later verify the checksums of files\n")

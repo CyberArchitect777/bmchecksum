@@ -77,7 +77,7 @@ class BMChecksumGUI(App):
         :return: The main layout of the application.
         """
 
-        self.title = "BMChecksum version 0.3.0"
+        self.title = "BMChecksum version 0.3.1"
         self.icon = os.path.join(
             os.path.dirname(__file__), "assets", "images", "icon_256x256.png"
         )
