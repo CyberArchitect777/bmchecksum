@@ -55,7 +55,7 @@ To acquire and run the latest source code, the following can be done.
 
 The GitHub repository is [here](https://github.com/CyberArchitect777/bmchecksum)
 
-The main development branch is located in the root directory. However, branches tagged in the versions/ directory contained stable editions. All versions of this software are tagged and can also be acquired with Git. An example of how to do this with the v0.3.0 codebase is:-
+The main development branch is located in the root directory. All versions of this software are tagged and can also be acquired with Git. An example of how to do this with the v0.3.0 codebase is:-
 
 `git checkout v0.3.0`
 
